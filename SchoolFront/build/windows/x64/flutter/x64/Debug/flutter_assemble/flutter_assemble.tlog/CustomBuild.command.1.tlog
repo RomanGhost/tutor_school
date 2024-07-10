@@ -1,0 +1,28 @@
+^D:\PROGRAMMING\INTELLJIDE\SCHOOL\BUILD\WINDOWS\X64\CMAKEFILES\31D18D4AB54BFB3BFFEF77BB0E606A25\FLUTTER_WINDOWS.DLL.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E env FLUTTER_ROOT=D:\Programming\flutter PROJECT_DIR=D:\Programming\IntelljIDE\School FLUTTER_ROOT=D:\Programming\flutter FLUTTER_EPHEMERAL_DIR=D:\Programming\IntelljIDE\School\windows\flutter\ephemeral PROJECT_DIR=D:\Programming\IntelljIDE\School FLUTTER_TARGET=D:\Programming\IntelljIDE\School\lib\main.dart DART_DEFINES=Zmx1dHRlci5pbnNwZWN0b3Iuc3RydWN0dXJlZEVycm9ycz10cnVl,RkxVVFRFUl9XRUJfQ0FOVkFTS0lUX1VSTD1odHRwczovL3d3dy5nc3RhdGljLmNvbS9mbHV0dGVyLWNhbnZhc2tpdC81NWVhZTY4NjRiMjk2ZGQ5ZjQzYjJjYzc1NzdlYzI1NmU1YzMyYThkLw== DART_OBFUSCATION=false TRACK_WIDGET_CREATION=true TREE_SHAKE_ICONS=false PACKAGE_CONFIG=D:\Programming\IntelljIDE\School\.dart_tool\package_config.json D:/Programming/flutter/packages/flutter_tools/bin/tool_backend.bat windows-x64 Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\PROGRAMMING\INTELLJIDE\SCHOOL\BUILD\WINDOWS\X64\CMAKEFILES\AA0D720A583BD486F97AFD47912E3CF4\FLUTTER_ASSEMBLE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^D:\PROGRAMMING\INTELLJIDE\SCHOOL\WINDOWS\FLUTTER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:/Programming/IntelljIDE/School/windows -BD:/Programming/IntelljIDE/School/build/windows/x64 --check-stamp-file D:/Programming/IntelljIDE/School/build/windows/x64/flutter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
