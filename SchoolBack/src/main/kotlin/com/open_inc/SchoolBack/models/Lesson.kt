@@ -4,20 +4,28 @@ import java.time.LocalDateTime
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "Level")
-data class Level(
+@Table(name = "Lesson")
+data class Lesson(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
-    @Column(name = "name", length = 4, unique = true, nullable = false)
-    val name: String,
+    @ManyToOne
+    @JoinColumn(name = "usersubject_id", nullable = false)
+    val userSubject: UserSubject,
 
-    @Column(name = "description", length = 256)
+    @Column(name = "mark")
+    val mark: Byte? = null,
+
+    @Column(name = "description", length = 512)
     val description: String? = null,
 
-    @Column(name = "coefficient")
-    val coefficient: Float? = null,
+    @ManyToOne
+    @JoinColumn(name = "status", nullable = false)
+    val status: Status,
+
+    @Column(name = "plain_datetime")
+    val plainDateTime: LocalDateTime? = null,
 
     @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),

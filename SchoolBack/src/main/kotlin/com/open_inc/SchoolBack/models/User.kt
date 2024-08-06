@@ -1,26 +1,23 @@
 package com.open_inc.SchoolBack.models
 
-import java.time.LocalDateTime
 import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
-@Table(name = "_User")
+@Table(name = "User_App")
 data class User(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
     @Column(name = "last_name", length = 128)
-    val lastName: String,
+    val lastName: String? = null,
 
     @Column(name = "first_name", length = 128)
-    val firstName: String,
+    val firstName: String? = null,
 
     @Column(name = "surname", length = 128)
-    val surname: String,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "level_id")
-    val level: Level,
+    val surname: String? = null,
 
     @Column(name = "email", length = 256, unique = true, nullable = false)
     val email: String,
@@ -28,15 +25,9 @@ data class User(
     @Column(name = "password", length = 256, nullable = false)
     val password: String,
 
-    @Column(name = "description", length = 512)
-    val description: String? = null,
-
-    @Column(name = "photo", length = 128)
-    val photo: String? = null,
-
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     val updatedAt: LocalDateTime = LocalDateTime.now()
 )
