@@ -3,6 +3,7 @@ import 'package:school/auth/register_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/AuthApi.dart';
+import '../person_account/person_account.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -27,6 +28,12 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setString('jwt', jwt);
         //TODO перенаправить в личный кабинет
         print("Аутентификация прошла успешно: $jwt");
+        // UserProfileScreen();
+        // MaterialPageRoute(builder: (context) => UserProfileScreen());
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UserProfileScreen()),
+        );
       } else {
         // Показ ошибки
         ScaffoldMessenger.of(context).showSnackBar(
