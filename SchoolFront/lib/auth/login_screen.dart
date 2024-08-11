@@ -3,6 +3,7 @@ import 'package:school/auth/register_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/AuthApi.dart';
+import '../dataclasses/User.dart';
 import '../person_account/person_account.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,18 +19,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (_formKey.currentState?.validate() ?? false) {
+      User user = User.undefined();
       final email = _emailController.text;
       final password = _passwordController.text;
+      user.setEmail(email);
+      user.setPassword(password);
 
-      final jwt = await _apiService.authenticateUser(email, password);
+      final jwt = await _apiService.authenticateUser(user);
       if (jwt != null) {
         // Сохранение JWT в локальное хранилище
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt', jwt);
         //TODO перенаправить в личный кабинет
         print("Аутентификация прошла успешно: $jwt");
-        // UserProfileScreen();
-        // MaterialPageRoute(builder: (context) => UserProfileScreen());
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => UserProfileScreen()),
@@ -47,48 +49,62 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null || value.isEmpty || !value.contains('@')) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            constraints: BoxConstraints(maxWidth: 400),
+            child: Card(
+              elevation: 8,
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(labelText: 'Email'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty ||
+                              !value.contains('@')) {
+                            return 'Please enter a valid email';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(labelText: 'Password'),
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty ||
+                              value.length < 6) {
+                            return 'Password must be at least 6 characters long';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _login,
+                        child: Text('Login'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RegisterScreen()),
+                          );
+                        },
+                        child: Text('Don\'t have an account? Register'),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty || value.length < 6) {
-                    return 'Password must be at least 6 characters long';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _login,
-                child: Text('Login'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterScreen()),
-                  );
-                },
-                child: Text('Don\'t have an account? Register'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

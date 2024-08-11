@@ -2,6 +2,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../dataclasses/User.dart';
+
 class ApiService {
   final String baseUrl = 'http://localhost:8080/api/auth'; // Замените на ваш IP
   String? _jwt;
@@ -21,13 +23,16 @@ class ApiService {
     await prefs.remove('jwt');
   }
 
-  Future<String?> authenticateUser(String email, String password) async {
+  Future<String?> authenticateUser(User user) async {
     try {
       final url = Uri.parse('$baseUrl/login');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email, 'password': password}),
+        body: json.encode({
+          'email': user.getEmail(),
+          'password': user.getPassword()
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -45,18 +50,18 @@ class ApiService {
     }
   }
 
-  Future<String?> registerUser(String firstName, String lastName, String surname, String email, String password) async {
+  Future<String?> registerUser(User newUser) async {
     try {
       final url = Uri.parse('$baseUrl/register');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'firstName': firstName,
-          'lastName': lastName,
-          'surname': surname,
-          'email': email,
-          'password': password,
+          'firstName': newUser.getFirstName(),
+          'lastName': newUser.getLastName(),
+          'surname': newUser.getSurname(),
+          'email': newUser.getEmail(),
+          'password': newUser.getPassword(),
         }),
       );
 

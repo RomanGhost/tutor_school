@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:school/widgets/side_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../api/AuthApi.dart';
 
@@ -23,8 +24,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? jwt = prefs.getString('jwt');
     Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt!);
-    // Получение email из декодированного токена
-    String? email = decodedToken['sub']; // 'sub' обычно используется для хранения идентификатора пользователя или email
+    String? email = decodedToken['sub'];
     print("Email: $email");
 
     final data = await _apiService.getUser(email!);
@@ -38,16 +38,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('User Profile'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              _apiService.logout();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          )
-        ],
       ),
+      drawer: SideMenu(), // Добавление боковой панели
       body: _userData == null
           ? Center(child: CircularProgressIndicator())
           : Padding(
@@ -58,6 +50,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             Text('First Name: ${_userData!['firstName']}', style: TextStyle(fontSize: 18)),
             Text('Last Name: ${_userData!['lastName']}', style: TextStyle(fontSize: 18)),
             Text('Email: ${_userData!['email']}', style: TextStyle(fontSize: 18)),
+            SizedBox(height: 20),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Welcome to your dashboard!',
+                  style: TextStyle(fontSize: 22),
+                ),
+              ),
+            ),
           ],
         ),
       ),
