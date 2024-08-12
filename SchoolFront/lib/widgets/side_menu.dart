@@ -25,8 +25,6 @@ class _SideMenu extends State<SideMenu> {
     String? jwt = prefs.getString('jwt');
     Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt!);
     String? email = decodedToken['sub'];
-    print("Email: $email");
-
     final data = await _apiService.getUser(email!);
     setState(() {
       _user.setEmail(data?['email']);

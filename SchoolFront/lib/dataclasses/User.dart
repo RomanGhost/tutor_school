@@ -41,6 +41,7 @@ class User{
     return _email;
   }
   void setEmail(String email){
+    email = email.toLowerCase();
     RegExp emailCheck = RegExp(r"([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)");
     if (!emailCheck.hasMatch(email)){
       EmailError("Email is not correct: $email");
