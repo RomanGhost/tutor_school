@@ -11,7 +11,7 @@ class UserService(
     private val passwordEncoder: PasswordEncoder
 ) {
 
-    fun registerUser(user: User): User {
+    fun saveUser(user: User): User {
         // Проверка уникальности email
         if (userRepository.existsByEmail(user.email)) {
             throw IllegalArgumentException("Email is already in use")
@@ -31,5 +31,20 @@ class UserService(
 
     fun existsByEmail(email: String): Boolean {
         return userRepository.existsByEmail(email)
+    }
+
+    fun updateUser(user:User):User{
+        val newUser:User
+
+        if (user.password != ""){
+            // Шифрование пароля
+            val encryptedPassword = passwordEncoder.encode(user.password)
+            newUser = user.copy(password = encryptedPassword)
+        }else{
+            val existUser = userRepository.findByEmail(user.email)
+            newUser = user.copy(password = existUser!!.password)
+        }
+        // Сохранение пользователя
+        return userRepository.save(newUser)
     }
 }

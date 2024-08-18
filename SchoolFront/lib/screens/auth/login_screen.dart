@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:school/screens/auth/register_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/AuthApi.dart';
 import '../../dataclasses/User.dart';
 import '../person_account/person_account.dart';
-
+import '../auth/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -18,32 +17,48 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final ApiService _apiService = ApiService();
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   Future<void> _login() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      User user = User.undefined();
-      final email = _emailController.text;
-      final password = _passwordController.text;
-      user.setEmail(email);
-      user.setPassword(password);
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      final user = User.undefined();
+      user.email = _emailController.text.trim();
+      user.password = _passwordController.text.trim();
 
       final jwt = await _apiService.authenticateUser(user);
+
       if (jwt != null) {
-        // Сохранение JWT в локальное хранилище
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('jwt', jwt);
-        //TODO перенаправить в личный кабинет
-        print("Аутентификация прошла успешно: $jwt");
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => UserProfileScreen()),
-        );
+        await _storeJwt(jwt);
+        _navigateToUserProfile();
       } else {
-        // Показ ошибки
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to login')),
-        );
+        _showErrorSnackbar('Failed to login');
       }
+    } catch (e) {
+      _showErrorSnackbar('An error occurred during login');
+      // Логирование ошибки может быть добавлено здесь
     }
+  }
+
+  Future<void> _storeJwt(String jwt) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('jwt', jwt);
+  }
+
+  void _navigateToUserProfile() {
+    Navigator.pushNamed(context, '/account');
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -52,8 +67,8 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(title: Text('Login')),
       body: Center(
         child: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
+          child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 400),
             child: Card(
               elevation: 8,
@@ -63,44 +78,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   key: _formKey,
                   child: Column(
                     children: <Widget>[
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(labelText: 'Email'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty ||
-                              !value.contains('@')) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(labelText: 'Password'),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty ||
-                              value.length < 6) {
-                            return 'Password must be at least 6 characters long';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _login,
-                        child: Text('Login'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RegisterScreen()),
-                          );
-                        },
-                        child: Text('Don\'t have an account? Register'),
-                      ),
+                      _buildEmailField(),
+                      SizedBox(height: 16),
+                      _buildPasswordField(),
+                      SizedBox(height: 24),
+                      _buildLoginButton(),
+                      SizedBox(height: 8),
+                      _buildRegisterButton(),
                     ],
                   ),
                 ),
@@ -109,6 +93,50 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildEmailField() {
+    return TextFormField(
+      controller: _emailController,
+      decoration: InputDecoration(labelText: 'Email'),
+      keyboardType: TextInputType.emailAddress,
+      validator: (value) {
+        if (value == null || value.isEmpty || !value.contains('@')) {
+          return 'Please enter a valid email';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      decoration: InputDecoration(labelText: 'Password'),
+      obscureText: true,
+      validator: (value) {
+        if (value == null || value.isEmpty || value.length < 6) {
+          return 'Password must be at least 6 characters long';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildLoginButton() {
+    return ElevatedButton(
+      onPressed: _login,
+      child: Text('Login'),
+    );
+  }
+
+  Widget _buildRegisterButton() {
+    return TextButton(
+      onPressed: () {
+        Navigator.pushNamed(context, '/signup');
+      },
+      child: Text('Don\'t have an account? Register'),
     );
   }
 }

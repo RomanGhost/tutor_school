@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:school/screens/auth/login_screen.dart';
+import 'package:school/screens/auth/register_screen.dart';
+import 'package:school/screens/person_account/edit_profile_screen.dart';
+import 'package:school/screens/person_account/person_account.dart';
 
 import 'screens/main_page/main_page.dart';
 
@@ -16,7 +20,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomeScreen(),
+        '/login': (context) => LoginScreen(),
+        '/signup': (context) => RegisterScreen(),
+        '/account':(context) => UserProfileScreen(),
+        '/profile':(context) => EditProfileScreen(),
+      },
     );
   }
 }

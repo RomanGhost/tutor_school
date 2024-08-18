@@ -3,12 +3,14 @@ package com.open_inc.SchoolBack.controllers
 import com.open_inc.SchoolBack.models.User
 import com.open_inc.SchoolBack.services.UserService
 import com.open_inc.SchoolBack.configs.JWTUtil
+import com.open_inc.SchoolBack.dataclasses.AuthResponse
+import com.open_inc.SchoolBack.dataclasses.LoginRequest
+import com.open_inc.SchoolBack.dataclasses.SignUpRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.web.bind.annotation.*
 
 @CrossOrigin
@@ -30,7 +32,7 @@ class AuthController(
                 lastName = signUpRequest.lastName,
                 surname = signUpRequest.surname
             )
-            userService.registerUser(user)
+            userService.saveUser(user)
 
             val jwtResponse = authenticateUser(LoginRequest(user.email, user.password))
             if (jwtResponse.statusCode == HttpStatus.OK) {
@@ -60,27 +62,4 @@ class AuthController(
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
         }
     }
-
-    @GetMapping("/user")
-    fun getUser(@RequestParam email: String): ResponseEntity<User> {
-        val user = userService.findUserByEmail(email) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-        return ResponseEntity.ok(user)
-    }
 }
-
-data class SignUpRequest(
-    val firstName: String,
-    val lastName: String,
-    val surname: String,
-    val email: String,
-    val password: String
-)
-
-data class LoginRequest(
-    val email: String,
-    val password: String
-)
-
-data class AuthResponse(
-    val jwt: String
-)

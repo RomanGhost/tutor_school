@@ -6,87 +6,126 @@ import '../api/AuthApi.dart';
 import '../dataclasses/User.dart';
 
 class SideMenu extends StatefulWidget {
+  const SideMenu({Key? key}) : super(key: key);
+
   @override
-  _SideMenu createState() => _SideMenu();
+  _SideMenuState createState() => _SideMenuState();
 }
 
-class _SideMenu extends State<SideMenu> {
-  User _user = User.undefined();
+class _SideMenuState extends State<SideMenu> {
+  late final Future<User> _userFuture;
   final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _userFuture = _loadUserData();
   }
 
-  Future<void> _loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? jwt = prefs.getString('jwt');
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt!);
-    String? email = decodedToken['sub'];
-    final data = await _apiService.getUser(email!);
-    setState(() {
-      _user.setEmail(data?['email']);
-      _user.setFirstName(data?['firstName']);
-    });
+  Future<User> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jwt = prefs.getString('jwt');
+
+    if (jwt == null || JwtDecoder.isExpired(jwt)) {
+      // Handle the case where JWT is missing or expired
+      return User.undefined();
+    }
+
+    final decodedToken = JwtDecoder.decode(jwt);
+    final email = decodedToken['sub'] as String?;
+
+    if (email == null) {
+      // Handle missing email in token
+      return User.undefined();
+    }
+
+    final user = await _apiService.getUser(email);
+    if (user != null) {
+      return user;
+    } else {
+      // Handle the case where user data couldn't be fetched
+      return User.undefined();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.indigoAccent,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _user.getFirstName(),
-                  style: TextStyle(color: Colors.white, fontSize: 24),
+      child: FutureBuilder<User>(
+        future: _userFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Error loading user data'));
+          }
+
+          final user = snapshot.data ?? User.undefined();
+
+          return ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  color: Colors.indigoAccent,
                 ),
-                Text(
-                  _user.getEmail(),
-                  style: const TextStyle(color: Colors.white, fontSize: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user.firstName.isNotEmpty ? user.firstName : 'Guest',
+                      style: const TextStyle(color: Colors.white, fontSize: 24),
+                    ),
+                    Text(
+                      user.email.isNotEmpty ? user.email : 'No email',
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.home),
-            title: Text('Home'),
-            onTap: () {
-              Navigator.pushNamed(context, '/home');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.calendar_today),
-            title: Text('Schedule'),
-            onTap: () {
-              Navigator.pushNamed(context, '/schedule');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Profile'),
-            onTap: () {
-              Navigator.pushNamed(context, '/profile');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Logout'),
-            onTap: () {
-// Logout logic here
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
+              ),
+              _buildListTile(
+                icon: Icons.home,
+                title: 'Home',
+                onTap: () => _navigateTo(context, '/account'),
+              ),
+              _buildListTile(
+                icon: Icons.person,
+                title: 'Profile',
+                onTap: () => _navigateTo(context, '/profile'),
+              ),
+              _buildListTile(
+                icon: Icons.logout,
+                title: 'Logout',
+                onTap: () => _logout(context),
+              ),
+            ],
+          );
+        },
       ),
     );
+  }
+
+  ListTile _buildListTile({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      onTap: onTap,
+    );
+  }
+
+  void _navigateTo(BuildContext context, String route) {
+    Navigator.pushNamed(context, route);
+  }
+
+  void _logout(BuildContext context) {
+    // Implement logout logic, such as clearing JWT and navigating to the login screen
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.remove('jwt');
+      Navigator.pushReplacementNamed(context, '/login');
+    });
   }
 }

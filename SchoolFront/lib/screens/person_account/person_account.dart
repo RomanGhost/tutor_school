@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:school/errors/JwtError.dart';
 import 'package:school/widgets/side_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../../api/AuthApi.dart';
+import '../../dataclasses/User.dart';
 import '../../widgets/next_lesson_widget.dart';
 
 
@@ -14,24 +16,34 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   final ApiService _apiService = ApiService();
-  Map<String, dynamic>? _userData;
+  User? _userData;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    try {
+      _loadUserData();
+    }on JwtIsNull catch(e){
+      print(e);
+      if (Navigator.canPop(context))
+        Navigator.pop(context);
+      else
+        Navigator.pushNamed(context, '/login');
+    }
   }
 
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? jwt = prefs.getString('jwt');
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt!);
+    if(jwt == null) {
+      throw JwtIsNull("Token is not valid");
+    }
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
     String? email = decodedToken['sub'];
-    print("Email: $email");
 
-    final data = await _apiService.getUser(email!);
+    final user = await _apiService.getUser(email!);
     setState(() {
-      _userData = data;
+      _userData = user;
     });
   }
 
@@ -50,9 +62,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             NextLessonWidget(),
-            Text('First Name: ${_userData!['firstName']}', style: TextStyle(fontSize: 18)),
-            Text('Last Name: ${_userData!['lastName']}', style: TextStyle(fontSize: 18)),
-            Text('Email: ${_userData!['email']}', style: TextStyle(fontSize: 18)),
             SizedBox(height: 20),
             Expanded(
               child: Center(
