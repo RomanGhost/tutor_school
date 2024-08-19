@@ -3,9 +3,9 @@ package com.open_inc.SchoolBack.controllers
 import com.open_inc.SchoolBack.models.User
 import com.open_inc.SchoolBack.services.UserService
 import com.open_inc.SchoolBack.configs.JWTUtil
-import com.open_inc.SchoolBack.dataclasses.AuthResponse
-import com.open_inc.SchoolBack.dataclasses.LoginRequest
-import com.open_inc.SchoolBack.dataclasses.SignUpRequest
+import com.open_inc.SchoolBack.dataclasses.auth.AuthResponse
+import com.open_inc.SchoolBack.dataclasses.auth.LoginRequest
+import com.open_inc.SchoolBack.dataclasses.auth.SignUpRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager

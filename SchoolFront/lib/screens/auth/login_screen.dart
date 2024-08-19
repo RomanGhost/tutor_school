@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../api/AuthApi.dart';
-import '../../dataclasses/User.dart';
+import '../../api/auth_api.dart';
+import '../../dataclasses/user.dart';
 import '../person_account/person_account.dart';
 import '../auth/register_screen.dart';
 
@@ -15,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final ApiService _apiService = ApiService();
+  final AuthApi _apiService = AuthApi();
 
   @override
   void dispose() {

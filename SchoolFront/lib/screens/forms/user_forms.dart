@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../dataclasses/User.dart';
-import '../../errors/UserErrors.dart';
+import '../../dataclasses/user.dart';
+import '../../errors/user_errors.dart';
 
 class UserForms{
   final _firstNameController = TextEditingController();
@@ -43,7 +43,7 @@ class UserForms{
     _surnameController.text = "";
   }
 
-  User getUser(){
+  User getUser({bool checkPassword=false}){
     User newUser = User.undefined();
     newUser.email = _emailController.text;
     newUser.firstName = _firstNameController.text;
@@ -52,7 +52,8 @@ class UserForms{
     if (_passwordController.text.isNotEmpty && _passwordController.text == _confirmPasswordController.text){
       newUser.password = _passwordController.text;
     }else{
-      throw PasswordError("Passwords do not match");
+      if(checkPassword)
+        throw PasswordError("Passwords do not match");
     }
     return newUser;
   }

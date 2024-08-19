@@ -34,17 +34,28 @@ class UserService(
     }
 
     fun updateUser(user:User):User{
-        val newUser:User
+        val existingUser = userRepository.findByEmail(user.email)
+            ?: throw IllegalArgumentException("User with this email does not exist")
 
-        if (user.password != ""){
-            // Шифрование пароля
+        val updatedUser = if (user.password.isNotBlank()) {
+            // Шифрование пароля, если он был обновлен
             val encryptedPassword = passwordEncoder.encode(user.password)
-            newUser = user.copy(password = encryptedPassword)
-        }else{
-            val existUser = userRepository.findByEmail(user.email)
-            newUser = user.copy(password = existUser!!.password)
+            existingUser.copy(
+                firstName = user.firstName,
+                lastName = user.lastName,
+                surname = user.surname,
+                password = encryptedPassword
+            )
+        } else {
+            // Если пароль не менялся, копируем только измененные поля
+            existingUser.copy(
+                firstName = user.firstName,
+                lastName = user.lastName,
+                surname = user.surname
+            )
         }
-        // Сохранение пользователя
-        return userRepository.save(newUser)
+
+        // Сохранение обновленного пользователя
+        return userRepository.save(updatedUser)
     }
 }

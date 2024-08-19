@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../api/AuthApi.dart';
-import '../../dataclasses/User.dart';
+import '../../api/auth_api.dart';
+import '../../dataclasses/user.dart';
 import '../forms/user_forms.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -12,7 +12,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final ApiService _apiService = ApiService();
+  final AuthApi _apiService = AuthApi();
   UserForms userForms = UserForms.undefined();
 
   Future<void> _submit() async {

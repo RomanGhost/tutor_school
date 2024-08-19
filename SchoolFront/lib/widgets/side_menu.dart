@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../api/AuthApi.dart';
-import '../dataclasses/User.dart';
+import '../api/auth_api.dart';
+import '../api/user_api.dart';
+import '../dataclasses/user.dart';
 
 class SideMenu extends StatefulWidget {
   const SideMenu({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class SideMenu extends StatefulWidget {
 
 class _SideMenuState extends State<SideMenu> {
   late final Future<User> _userFuture;
-  final ApiService _apiService = ApiService();
+  final UserApi _apiService = UserApi();
 
   @override
   void initState() {

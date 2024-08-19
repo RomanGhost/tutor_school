@@ -1,4 +1,4 @@
-package com.open_inc.SchoolBack.dataclasses
+package com.open_inc.SchoolBack.dataclasses.auth
 
 data class SignUpRequest(
     val firstName: String,

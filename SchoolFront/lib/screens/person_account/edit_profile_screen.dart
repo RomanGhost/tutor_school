@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:school/errors/UserErrors.dart';
+import 'package:school/api/user_api.dart';
+import 'package:school/errors/user_errors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
-import '../../api/AuthApi.dart';
-import '../../dataclasses/User.dart';
-import '../../errors/JwtError.dart';
+import '../../dataclasses/user.dart';
+import '../../errors/jwt_errors.dart';
 import '../../widgets/side_menu.dart';
 import '../forms/user_forms.dart';
 
@@ -15,40 +15,20 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final ApiService _apiService = ApiService();
+  final UserApi _apiService = UserApi();
   final _formKey = GlobalKey<FormState>();
-  User user = User.undefined();
   UserForms userForms = UserForms.undefined();
 
-  // Map<String, dynamic>? _userData;
-
-  @override
-  void initState() {
-    super.initState();
-    try {
-      _loadUserData();
-    }on JwtIsNull catch(e){
-      print(e);
-      Navigator.pop(context);
-    }
-  }
-
-  Future<void> _loadUserData() async {
+  Future<User?> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? jwt = prefs.getString('jwt');
-    if(jwt == null) {
+    if (jwt == null) {
       throw JwtIsNull("Token is not valid");
     }
     Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
     String? email = decodedToken['sub'];
-    if(email == null) return;
-    final user = await _apiService.getUser(email);
-    setState(() {
-      if (user != null) {
-        this.user.email = user.email;
-        userForms = UserForms(user);
-      }
-    });
+    if (email == null) return null;
+    return await _apiService.getUser(email);
   }
 
   Future<void> _saveProfile() async {
@@ -56,21 +36,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       User updateUser;
       try {
         updateUser = userForms.getUser();
-      } on PasswordError catch(e) {
-        _showErrorSnackbar(e as String);
+      } on PasswordError catch (e) {
+        _showErrorSnackbar(e.cause);
         return;
       }
 
       final result = await _apiService.updateUserProfile(updateUser);
       if (result) {
-        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Profile updated successfully')),
         );
       } else {
         _showErrorSnackbar('Failed to update profile');
       }
-
     }
   }
 
@@ -93,30 +71,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         title: const Text('Edit Profile'),
       ),
       drawer: const SideMenu(), // Добавление боковой панели
-      body: user.email == ""
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              // userForms.buildEmailNameField(),
-              // const SizedBox(height: 20),
-              userForms.buildFirstNameField(),
-              const SizedBox(height: 20),
-              userForms.buildLastNameField(),
-              const SizedBox(height: 20),
-              userForms.buildSurnameField(),
-              const SizedBox(height: 20),
-              userForms.buildPasswordField(),
-              const SizedBox(height: 20),
-              userForms.buildConfirmPasswordField(),
-              const SizedBox(height: 20),
-              _buildSaveButton(),
-            ],
-          ),
-        ),
+      body: FutureBuilder<User?>(
+        future: _loadUserData(),
+        builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData && snapshot.data != null) {
+            userForms = UserForms(snapshot.data!);
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  children: <Widget>[
+                    userForms.buildFirstNameField(),
+                    const SizedBox(height: 20),
+                    userForms.buildLastNameField(),
+                    const SizedBox(height: 20),
+                    userForms.buildSurnameField(),
+                    const SizedBox(height: 20),
+                    userForms.buildPasswordField(),
+                    const SizedBox(height: 20),
+                    userForms.buildConfirmPasswordField(),
+                    const SizedBox(height: 20),
+                    _buildSaveButton(),
+                  ],
+                ),
+              ),
+            );
+          } else {
+            return const Center(child: Text('User data not found.'));
+          }
+        },
       ),
     );
   }
