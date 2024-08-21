@@ -13,7 +13,7 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
   final ValueNotifier<Map<DateTime, List<Lesson>>> _lessonsNotifier = ValueNotifier({});
   final ValueNotifier<DateTime> _selectedDayNotifier = ValueNotifier(DateTime.now());
   DateTime _focusedDay = DateTime.now();
-  final lessonApi = LessonApi();
+  final LessonApi _lessonApi = LessonApi();
 
   @override
   void initState() {
@@ -22,24 +22,24 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
   }
 
   void _initializeLessons() async {
-    final List<Lesson> lessons = await lessonApi.getLessons();
-    Map<DateTime, List<Lesson>> resultLessons = {};
+    try {
+      final List<Lesson> lessons = await _lessonApi.getLessons();
+      final Map<DateTime, List<Lesson>> resultLessons = {};
 
-    for (var lesson in lessons) {
-      // Extract only the date portion for mapping
-      DateTime date = DateTime.utc(lesson.time.year, lesson.time.month, lesson.time.day);
-      if (resultLessons.containsKey(date)) {
-        resultLessons[date]!.add(lesson);
-      } else {
-        resultLessons[date] = [lesson];
+      for (var lesson in lessons) {
+        final DateTime date = DateTime.utc(lesson.time.year, lesson.time.month, lesson.time.day);
+        if (resultLessons.containsKey(date)) {
+          resultLessons[date]!.add(lesson);
+        } else {
+          resultLessons[date] = [lesson];
+        }
       }
-    }
-    _lessonsNotifier.value = resultLessons;
 
-    // Updating the ValueNotifier and triggering a UI rebuild
-    setState(() {
-      _lessonsNotifier;
-    });
+      _lessonsNotifier.value = resultLessons;
+    } catch (e) {
+      // Handle any errors
+      print('Failed to initialize lessons: $e');
+    }
   }
 
   List<Lesson> _getLessonsForDay(DateTime day) {
@@ -69,16 +69,19 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
     );
   }
 
-  void _deleteLesson(DateTime day, int index) {
-    final lesson = _lessonsNotifier.value[day];
-    if (lesson != null && lesson.isNotEmpty) {
-      lesson.removeAt(index);
-      if (lesson.isEmpty) {
-        _lessonsNotifier.value.remove(day);
+  void _deleteLesson(DateTime day, int lessonId) {
+    final lessons = _lessonsNotifier.value[day];
+    if (lessons != null) {
+      final lessonIndex = lessons.indexWhere((l) => l.id == lessonId);
+      if (lessonIndex != -1) {
+        setState(() {
+          lessons.removeAt(lessonIndex);
+          if (lessons.isEmpty) {
+            _lessonsNotifier.value.remove(day);
+          }
+          _lessonsNotifier.value = Map.from(_lessonsNotifier.value); // Notify listeners
+        });
       }
-      setState(() {
-        _lessonsNotifier;
-      });
     }
   }
 
@@ -90,9 +93,7 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
         ..._lessonsNotifier.value,
         day: lessons,
       };
-      _lessonsNotifier;// Notify listeners after adding a lesson
     });
-    print(_lessonsNotifier.value);
   }
 
   @override
@@ -168,5 +169,9 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
         fontSize: 18,
       ),
     );
+  }
+
+  bool isSameDay(DateTime day1, DateTime day2) {
+    return day1.year == day2.year && day1.month == day2.month && day1.day == day2.day;
   }
 }

@@ -40,6 +40,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       throw JwtIsNull("Token is not valid");
     }
     Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
+    print(decodedToken);
     String? email = decodedToken['sub'];
 
     final user = await _apiService.getUser(email!);

@@ -3,6 +3,7 @@ package com.open_inc.SchoolBack.controllers
 import com.open_inc.SchoolBack.models.User
 import com.open_inc.SchoolBack.services.UserService
 import com.open_inc.SchoolBack.configs.JWTUtil
+import com.open_inc.SchoolBack.configs.MyUserDetails
 import com.open_inc.SchoolBack.dataclasses.auth.AuthResponse
 import com.open_inc.SchoolBack.dataclasses.auth.LoginRequest
 import com.open_inc.SchoolBack.dataclasses.auth.SignUpRequest
@@ -55,7 +56,7 @@ class AuthController(
                 )
             )
 
-            val userDetails = authentication.principal as UserDetails
+            val userDetails = authentication.principal as MyUserDetails
             val jwt = jwtUtil.generateToken(userDetails)
             ResponseEntity.ok(AuthResponse(jwt))
         } catch (ex: Exception) {

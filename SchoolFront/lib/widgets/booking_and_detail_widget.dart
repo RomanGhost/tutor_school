@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:school/api/lesson_api.dart';
 import '../dataclasses/lesson.dart';
 import 'subject_picker_widget.dart';
 
@@ -24,18 +24,11 @@ class BookingAndDetailWidget extends StatefulWidget {
 }
 
 class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
-  final List<String> _availableSubjects = [
-    'Математика',
-    'Физика',
-    'Химия',
-    'Биология',
-    'История',
-    'География',
-    'Английский язык',
-    'Русский язык',
-    'Литература',
+  final List<String> _availableSubjects = const [
+    'Английский',
   ];
 
+  final LessonApi _lessonApi = LessonApi();
   String? _selectedSubject;
   TimeOfDay? _selectedTime;
 
@@ -51,111 +44,143 @@ class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            "Уроки на ${_formatDate(widget.day)}",
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          _buildHeader(),
           const SizedBox(height: 16),
-          ValueListenableBuilder<Map<DateTime, List<Lesson>>>(
-            valueListenable: widget.lessonsNotifier,
-            builder: (context, lessonsMap, _) {
-              final lessons = lessonsMap[widget.day] ?? [];
-              return Column(
-                children: lessons.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final lesson = entry.value;
-                  return _buildLessonCard(index, lesson);
-                }).toList(),
-              );
-            },
-          ),
+          _buildLessonsList(),
           if (widget.allowAdding) _buildLessonForm(),
         ],
       ),
     );
   }
 
-  Widget _buildLessonCard(int index, Lesson lesson) {
+  Widget _buildHeader() {
+    return Text(
+      "Уроки на ${_formatDate(widget.day)}",
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildLessonsList() {
+    return ValueListenableBuilder<Map<DateTime, List<Lesson>>>(
+      valueListenable: widget.lessonsNotifier,
+      builder: (context, lessonsMap, _) {
+        final lessons = lessonsMap[widget.day] ?? [];
+        return Column(
+          children: lessons.map((lesson) => _buildLessonCard(lesson)).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildLessonCard(Lesson lesson) {
     return Card(
       elevation: 4,
       child: ListTile(
-        title: Row(
-          children: [
-            Text(
-              '${lesson.status}: ',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: _getStatusColor(lesson.status),
-              ),
-            ),
-            Expanded(
-              child: Text(
-                lesson.toString(),
-                style: const TextStyle(fontSize: 18),
-              ),
-            ),
-          ],
-        ),
-        trailing: _buildDeleteButton(index, widget.day),
+        title: _buildLessonTitle(lesson),
+        trailing: _buildDeleteButton(lesson),
       ),
     );
   }
 
-  IconButton? _buildDeleteButton(int index, DateTime day) {
-    final isPast = day.isBefore(DateTime.now()) && !isSameDay(day, DateTime.now());
-    return isPast
-        ? null
-        : IconButton(
-      icon: const Icon(Icons.delete, color: Colors.black87),
-      onPressed: () {
-        widget.onDelete(index);
-        setState(() {});
-      },
+  Widget _buildLessonTitle(Lesson lesson) {
+    return Row(
+      children: [
+        Text(
+          '${lesson.status}: ',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: _getStatusColor(lesson.status),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            lesson.toString(),
+            style: const TextStyle(fontSize: 18),
+          ),
+        ),
+      ],
     );
+  }
+
+  IconButton? _buildDeleteButton(Lesson lesson) {
+    final isPast = widget.day.isBefore(DateTime.now()) && !isSameDay(widget.day, DateTime.now());
+    if (isPast) return null;
+
+    return IconButton(
+      icon: const Icon(Icons.delete, color: Colors.black87),
+      onPressed: () => _deleteLesson(lesson),
+    );
+  }
+
+  Future<void> _deleteLesson(Lesson lesson) async {
+    try {
+      final bool success = await _lessonApi.deleteLesson(lesson.id);
+      if (success) {
+        widget.onDelete(lesson.id);
+        _removeLessonFromNotifier(lesson);
+      } else {
+        _showError('Не удалось удалить урок');
+      }
+    } catch (e) {
+      _showError('Ошибка при удалении урока: ${e.toString()}');
+    }
+  }
+
+  void _removeLessonFromNotifier(Lesson lesson) {
+    final lessons = widget.lessonsNotifier.value[widget.day];
+    if (lessons != null) {
+      setState(() {
+        lessons.removeWhere((l) => l.id == lesson.id);
+        widget.lessonsNotifier.value[widget.day] = lessons;
+      });
+    }
   }
 
   Widget _buildLessonForm() {
     return Column(
       children: [
         const SizedBox(height: 16),
-        SubjectPickerWidget(
-          subjects: _availableSubjects,
-          selectedSubject: _selectedSubject,
-          onSubjectSelected: (subject) {
-            setState(() {
-              _selectedSubject = subject;
-            });
-          },
-        ),
+        _buildSubjectPicker(),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                _selectedTime != null
-                    ? "Время: ${_selectedTime!.format(context)}"
-                    : "Выберите время",
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () => _pickTime(context),
-              child: const Text("Выбрать время"),
-            ),
-          ],
-        ),
+        _buildTimePicker(),
         const SizedBox(height: 16),
+        _buildSaveButton(),
+      ],
+    );
+  }
+
+  Widget _buildSubjectPicker() {
+    return SubjectPickerWidget(
+      subjects: _availableSubjects,
+      selectedSubject: _selectedSubject,
+      onSubjectSelected: (subject) => setState(() {
+        _selectedSubject = subject;
+      }),
+    );
+  }
+
+  Widget _buildTimePicker() {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            _selectedTime != null
+                ? "Время: ${_selectedTime!.format(context)}"
+                : "Выберите время",
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
         ElevatedButton(
-          onPressed: _saveLesson,
-          child: const Text("Добавить урок"),
+          onPressed: () => _pickTime(),
+          child: const Text("Выбрать время"),
         ),
       ],
     );
   }
 
-  Future<void> _pickTime(BuildContext context) async {
-    final picked = await showTimePicker(
+  Future<void> _pickTime() async {
+    final pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
       builder: (context, child) => MediaQuery(
@@ -163,39 +188,59 @@ class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
         child: child!,
       ),
     );
-    if (picked != null) {
-      setState(() {
-        _selectedTime = picked;
-      });
+
+    if (pickedTime != null) {
+      setState(() => _selectedTime = pickedTime);
     }
   }
 
-  void _saveLesson() {
-    if (_selectedSubject != null && _selectedTime != null) {
-      // Convert _selectedTime (TimeOfDay) to DateTime
-      final DateTime lessonDateTime = DateTime(
-        widget.day.year,
-        widget.day.month,
-        widget.day.day,
-        _selectedTime!.hour,
-        _selectedTime!.minute,
-      );
+  Widget _buildSaveButton() {
+    return ElevatedButton(
+      onPressed: _saveLesson,
+      child: const Text("Добавить урок"),
+    );
+  }
 
-      final newLesson = Lesson(
-        title: _selectedSubject!,
-        time: lessonDateTime,  // Use the converted DateTime
-        status: "Создан",
-      );
+  Future<void> _saveLesson() async {
+    if (_selectedSubject == null || _selectedTime == null) {
+      _showError("Выберите предмет и время");
+      return;
+    }
 
-      widget.onSave(newLesson);
+    final lessonDateTime = DateTime(
+      widget.day.year,
+      widget.day.month,
+      widget.day.day,
+      _selectedTime!.hour,
+      _selectedTime!.minute,
+    );
 
-      setState(() {
-        _selectedSubject = null;
-        _selectedTime = null;
-      });
+    final newLesson = Lesson(
+      title: _selectedSubject!,
+      time: lessonDateTime,
+      status: "Создан",
+    );
+
+    try {
+      final addedLesson = await _lessonApi.addLessons(newLesson);
+      if (addedLesson != null) {
+        print(addedLesson.id);
+        widget.onSave(addedLesson);
+        _resetForm();
+      } else {
+        _showError('Не удалось добавить урок');
+      }
+    } catch (e) {
+      _showError('Ошибка при добавлении урока: ${e.toString()}');
     }
   }
 
+  void _resetForm() {
+    setState(() {
+      _selectedSubject = null;
+      _selectedTime = null;
+    });
+  }
 
   Color _getStatusColor(String status) {
     switch (status) {
@@ -211,5 +256,15 @@ class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
 
   String _formatDate(DateTime date) {
     return "${date.day}.${date.month}.${date.year}";
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  bool isSameDay(DateTime day1, DateTime day2) {
+    return day1.year == day2.year && day1.month == day2.month && day1.day == day2.day;
   }
 }

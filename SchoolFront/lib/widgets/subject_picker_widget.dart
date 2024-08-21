@@ -15,12 +15,13 @@ class SubjectPickerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      decoration: const InputDecoration(labelText: 'Выберите предмет'),
-      value: selectedSubject,
+      decoration: const InputDecoration(labelText: "Выберите предмет"),
+      value: subjects.firstOrNull ?? selectedSubject,
+      //TODO Сделать оцию другой
       items: subjects.map((subject) {
         return DropdownMenuItem<String>(
           value: subject,
-          child: Text(subject),
+          child: Text("$subject язык"),
         );
       }).toList(),
       onChanged: onSubjectSelected,

@@ -4,7 +4,6 @@ import com.open_inc.SchoolBack.configs.JWTUtil
 import com.open_inc.SchoolBack.dataclasses.LessonData
 import com.open_inc.SchoolBack.models.Lesson
 import com.open_inc.SchoolBack.services.*
-import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -28,14 +27,14 @@ class LessonController (
         val returnLessons:MutableList<LessonData> = mutableListOf()
         for(lesson in lessons){
             val returnLesson = LessonData(
+                id = lesson.id,
                 subject=lesson.userSubject.subject.name,
                 plainDateTime = lesson.plainDateTime!!,
                 status = lesson.status.name!!,
             )
             returnLessons.add(returnLesson)
         }
-        val res = ResponseEntity.ok(returnLessons)
-        println(res)
+//        val res = ResponseEntity.ok(returnLessons)
         return ResponseEntity.ok(returnLessons)
     }
 
@@ -46,20 +45,34 @@ class LessonController (
         val user = userService.findUserByEmail(userEmail)
 
         val subject = subjectService.getSubjectByName(lesson.subject)
-
+        //TODO "Сделать обработку ошибки с предметом"
         val userSubject = userSubjectService.getUserSubjectByUserAndSubject(user!!, subject)
 
         val status = statusService.getStatusByName(lesson.status)
 
-        val newLesson = Lesson(userSubject=userSubject, status=status)
-        lessonService.addLesson(newLesson)
+        val newLesson = Lesson(userSubject=userSubject, status=status, plainDateTime = lesson.plainDateTime)
 //        println(returnLesson)
 
-        val returnLesson = LessonData(
+        val returnLesson = lessonService.addLesson(newLesson)
+
+        val returnLessonData = LessonData(
+            id=returnLesson.id,
             subject=newLesson.userSubject.subject.name,
             plainDateTime = newLesson.plainDateTime!!,
             status = newLesson.status.name!!,
         )
-        return ResponseEntity.ok(returnLesson)
+
+        return ResponseEntity.ok(returnLessonData)
     }
+
+    @DeleteMapping("/remove")
+    fun removeLesson(@RequestHeader("Authorization") token: String, @RequestParam lessonId: Int): ResponseEntity<Void> {
+        val result = lessonService.deleteLessonById(lessonId)
+        return if (result) {
+            ResponseEntity.ok().build()
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
 }

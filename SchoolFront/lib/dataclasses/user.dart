@@ -1,4 +1,4 @@
-import 'package:school/errors/user_errors.dart';
+import '../errors/user_errors.dart';
 
 class User {
   String _firstName;

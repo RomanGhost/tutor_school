@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
+
 import '../dataclasses/lesson.dart';
 import '../service/jwt_work.dart';
 import 'package:http/http.dart' as http;
@@ -31,6 +33,7 @@ class LessonApi implements Api{
         //
         for (var lessonJson in result){
           Lesson newLesson = Lesson(
+              id: lessonJson['id'],
               title: lessonJson['subject'],
               time: DateTime.parse(lessonJson['plainDateTime']),
               status: lessonJson['status']
@@ -39,12 +42,81 @@ class LessonApi implements Api{
         }
         return resultLessons;
       } else {
-        _logError('Failed to get user', response);
+        _logError('Failed to get lesson', response);
       }
     } catch (e) {
       print('Error occurred while fetching lesson: $e');
     }
     return List<Lesson>.empty();
+  }
+
+  Future<Lesson?> addLessons(Lesson lesson) async{
+    final jwt = await JwtWork().getJwt();
+    if (jwt == null) {
+      print('No JWT found, user may not be authenticated.');
+      return null;
+    }
+
+    final url = Uri.parse('$_baseUrl/add');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwt',
+        },
+        body: json.encode({
+          'subject':lesson.title,
+          'status':lesson.status,
+          'plainDateTime':lesson.time.toIso8601String(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> lessonJson = json.decode(response.body) as Map<String, dynamic>;
+        Lesson lesson = Lesson(
+            id: lessonJson['id'],
+            title: lessonJson['subject'],
+            time: DateTime.parse(lessonJson['plainDateTime']),
+            status: lessonJson['status']
+        );
+        print('lesson saved successfully');
+        return lesson;
+      } else {
+        _logError('Failed to save lesson', response);
+      }
+    } catch (e) {
+      print('Error occurred while fetching lesson: $e');
+    }
+    return null;
+  }
+
+  Future<bool> deleteLesson(int lessonId) async {
+    final jwt = await JwtWork().getJwt();
+    if (jwt == null) {
+      print('No JWT found, user may not be authenticated.');
+      return false;
+    }
+    final url = Uri.parse('$_baseUrl/remove?lessonId=$lessonId');
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwt',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Lesson deleted successfully');
+        return true;
+      } else {
+        _logError('Failed to delete lesson', response);
+      }
+    } catch (e) {
+      print('Error occurred while deleting lesson: $e');
+    }
+    return false;
   }
 
   void _logError(String message, http.Response response) {

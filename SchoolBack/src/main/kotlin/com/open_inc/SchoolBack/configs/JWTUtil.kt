@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.Date
@@ -15,8 +16,9 @@ class JWTUtil {
 //    private val secretPhrase: String = System.getenv("JWT_SECRET") ?: "defaultSecret" // Рекомендуется использовать переменные окружения
     private val hourLife: Long = 10 // Задайте это значение в конфигурации
 
-    fun generateToken(userDetails: UserDetails): String {
-        val claims: Map<String, Any> = HashMap()
+    fun generateToken(userDetails: MyUserDetails): String {
+        val claims: MutableMap<String, Any> = HashMap()
+        claims["role"] = userDetails.authorities.firstOrNull() ?: SimpleGrantedAuthority("User")
         return doGenerateToken(claims, userDetails.username)
     }
 

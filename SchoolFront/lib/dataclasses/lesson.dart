@@ -2,16 +2,24 @@
 import 'package:flutter/material.dart';
 
 class Lesson {
-  final String title;
-  final DateTime time;
-  final String status;
+  late final int _id;
+  final String _title;
+  final DateTime _time;
+  final String _status;
 
-  Lesson({required this.title, required this.time, required this.status});
+  void set id(id) => _id=id;
+
+  int get id => _id;
+  String get title => _title;
+  DateTime get time => _time;
+  String get status => _status;
+
+  Lesson({int id=0, required String title, required time, required status}) : _title = title, _time=time, _status=status, _id=id;
 
   @override
   String toString() {
-    final String formattedTime = _formatTimeOfDay(time);
-    return '$title в $formattedTime';
+    final String formattedTime = _formatTimeOfDay(_time);
+    return '$_title в $formattedTime';
   }
 
   String _formatTimeOfDay(DateTime time) {
