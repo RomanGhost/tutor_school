@@ -35,7 +35,7 @@ class JWTUtil {
             .compact()
     }
 
-    fun validateToken(token: String, userDetails: UserDetails): Boolean {
+    fun validateToken(token: String, userDetails: MyUserDetails): Boolean {
         val username = getUsernameFromToken(token)
         return (username == userDetails.username && !isTokenExpired(token))
     }

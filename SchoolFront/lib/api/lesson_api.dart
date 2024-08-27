@@ -7,7 +7,7 @@ import '../service/jwt_work.dart';
 import 'package:http/http.dart' as http;
 import 'api_interface.dart';
 
-class LessonApi implements Api{
+class LessonApi extends Api{
   final String _baseUrl = 'http://localhost:8080/api/lesson'; // Замените на ваш IP
 
   Future<List<Lesson>> getLessons() async{
@@ -42,7 +42,7 @@ class LessonApi implements Api{
         }
         return resultLessons;
       } else {
-        _logError('Failed to get lesson', response);
+        logError('Failed to get lesson', response);
       }
     } catch (e) {
       print('Error occurred while fetching lesson: $e');
@@ -83,7 +83,7 @@ class LessonApi implements Api{
         print('lesson saved successfully');
         return lesson;
       } else {
-        _logError('Failed to save lesson', response);
+        logError('Failed to save lesson', response);
       }
     } catch (e) {
       print('Error occurred while fetching lesson: $e');
@@ -111,16 +111,11 @@ class LessonApi implements Api{
         print('Lesson deleted successfully');
         return true;
       } else {
-        _logError('Failed to delete lesson', response);
+        logError('Failed to delete lesson', response);
       }
     } catch (e) {
       print('Error occurred while deleting lesson: $e');
     }
     return false;
   }
-
-  void _logError(String message, http.Response response) {
-    print('$message: ${response.statusCode} ${response.body}');
-  }
-
 }

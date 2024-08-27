@@ -11,4 +11,8 @@ class SubjectService(
     fun getSubjectByName(name:String) : Subject{
         return subjectRepository.findSubjectByName(name)
     }
+
+    fun getAllSubjects() : List<Subject>{
+        return subjectRepository.findAll()
+    }
 }

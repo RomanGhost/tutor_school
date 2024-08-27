@@ -17,7 +17,7 @@ class SubjectPickerWidget extends StatelessWidget {
     return DropdownButtonFormField<String>(
       decoration: const InputDecoration(labelText: "Выберите предмет"),
       value: subjects.firstOrNull ?? selectedSubject,
-      //TODO Сделать оцию другой
+      //TODO Сделать опцию другой
       items: subjects.map((subject) {
         return DropdownMenuItem<String>(
           value: subject,

@@ -1,72 +1,57 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import "package:url_launcher/url_launcher.dart";
-
-import '../auth/login_screen.dart';
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final String _profileImage = 'https://sun9-17.userapi.com/impg/Y6qMi35j6HE6HeZ6uS4HGsRe4pc5BYeXHy-h8g/m71YiHlpWH8.jpg?size=2560x1920&quality=95&sign=f64d0fb93c2676b015ab8d974b347515&type=album';
+  final String _profileImageUrl = 'https://sun9-17.userapi.com/impg/Y6qMi35j6HE6HeZ6uS4HGsRe4pc5BYeXHy-h8g/m71YiHlpWH8.jpg?size=2560x1920&quality=95&sign=f64d0fb93c2676b015ab8d974b347515&type=album';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 60,
-        title: const Text('Репетитор английского языка'),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/login');
-            },
-            child: const Text('Личный кабинет'),
-          ),
-        ],
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.blue.shade100],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+      appBar: _buildAppBar(),
+      body: _buildBody(),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      toolbarHeight: 60,
+      title: const Text('Репетитор английского языка'),
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.pushNamed(context, '/login'),
+          child: const Text('Личный кабинет'),
         ),
-        child: SingleChildScrollView(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildInfoCard(),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildProfileImage(),
-                    const SizedBox(height: 20),
-                    _buildPracticingBlock(),
-                    const SizedBox(height: 20),
-                    _buildReviewSection(),
-                  ],
-                ),
-              ),
-            ],
-          ),
+      ],
+    );
+  }
+
+  Widget _buildBody() {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.white, Colors.blue.shade100],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: SingleChildScrollView(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: _buildInfoCard()),
+            const SizedBox(width: 20),
+            Expanded(child: _buildProfileAndReviews()),
+          ],
         ),
       ),
     );
@@ -76,71 +61,48 @@ class _HomeScreenState extends State<HomeScreen> {
     return _buildContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _buildTextSection(
-            'Здравствуйте!',
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue.shade800,
-            ),
-          ),
+        children: [
+          _buildHeaderText('Здравствуйте!', fontSize: 26),
           const SizedBox(height: 10),
-          _buildTextSection(
+          _buildBodyText(
             'Меня зовут Ольга, и я — Ваш личный репетитор по английскому и немецкому языкам. '
-                'Готовы открыть новые горизонты? '
-                'Вместе мы достигнем ваших языковых целей, повышение уровня владения языком для работы или путешествий, '
-                'или просто желание свободно и уверенно общаться на английском и немецком. '
-                'Я помогу вам сделать учебу увлекательной и продуктивной. '
-                'Присоединяйтесь ко мне в этом языковом путешествии, '
-                'и вы скоро заметите, как легко и приятно овладевать новыми языками!',
-            fontSize: 18,
+                'Готовы открыть новые горизонты? Вместе мы достигнем ваших языковых целей. '
+                'Я помогу вам сделать учебу увлекательной и продуктивной. Присоединяйтесь ко мне в этом языковом путешествии!',
           ),
           const SizedBox(height: 20),
-          _buildTextSection(
-            'Мои услуги:',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue.shade800,
-            ),
-          ),
+          _buildHeaderText('Мои услуги:'),
           const SizedBox(height: 10),
-          _buildTextSection(
+          _buildBodyText(
             '- Индивидуальные занятия Online\n- Индивидуальные занятия Offline в г. Самара\n',
-            fontSize: 18,
           ),
           const SizedBox(height: 20),
-          _buildTextSection(
-            'Почему выбирают меня?',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue.shade800,
-            ),
-          ),
+          _buildHeaderText('Почему выбирают меня?'),
           const SizedBox(height: 10),
-          _buildTextSection(
-            '- Индивидуальный подход к каждому ученику\n- Опыт и квалификация\n- Доступность и гибкость\n- Дружелюбная атмосфера на занятиях',
-            fontSize: 18,
+          _buildBodyText(
+            '- Индивидуальный подход к каждому ученику\n'
+                '- Опыт и квалификация\n'
+                '- Доступность и гибкость\n'
+                '- Дружелюбная атмосфера на занятиях',
           ),
           const SizedBox(height: 20),
-          _buildTextSection(
-            'Контакты:',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue.shade800,
-            ),
-          ),
+          _buildHeaderText('Контакты:'),
           const SizedBox(height: 10),
-          _buildLinkSection(
-            label: 'Телеграм: ',
-            linkText: '@ichbinOlya',
-            url: 'https://t.me/ichbinOlya',
-          ),
+          _buildLinkSection(label: 'Телеграм: ', linkText: '@ichbinOlya', url: 'https://t.me/ichbinOlya'),
         ],
       ),
+    );
+  }
+
+  Widget _buildProfileAndReviews() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildProfileImage(),
+        const SizedBox(height: 20),
+        _buildPracticingBlock(),
+        const SizedBox(height: 20),
+        _buildReviewSection(),
+      ],
     );
   }
 
@@ -148,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(15),
       child: Image.network(
-        _profileImage,
+        _profileImageUrl,
         fit: BoxFit.cover,
       ),
     );
@@ -159,88 +121,57 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildHeaderText('Отзыв:'),
           const SizedBox(height: 10),
-          Text(
-            'Отзыв:',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue.shade800,
-            ),
+          _buildReview(
+            reviewer: 'Роман Романович',
+            rating: 5,
+            comment: 'Отличный преподаватель! Занятия проходят интересно и продуктивно. Очень доволен результатом.',
           ),
-          Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
-                const Text(
-                  'Роман Романович',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  children: List.generate(5, (index) {
-                    return Icon(
-                      index < 5 ? Icons.star : Icons.star_border,
-                      color: Colors.yellow,
-                    );
-                  }),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  'Отличный преподаватель! Занятия проходят интересно и продуктивно. Очень доволен результатом.',
-                  style: TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Иван Иванов',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  children: List.generate(5, (index) {
-                    return Icon(
-                      index < 4 ? Icons.star : Icons.star_border,
-                      color: Colors.yellow,
-                    );
-                  }),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  'Отличный преподаватель! Занятия проходят интересно и продуктивно. Очень доволен результатом.',
-                  style: TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Олег Олегович',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  children: List.generate(5, (index) {
-                    return Icon(
-                      index < 2 ? Icons.star : Icons.star_border,
-                      color: Colors.yellow,
-                    );
-                  }),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  'Отличный преподаватель! Занятия проходят интересно и продуктивно. Очень доволен результатом.',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ]
-          )
+          const SizedBox(height: 20),
+          _buildReview(
+            reviewer: 'Иван Иванов',
+            rating: 4,
+            comment: 'Отличный преподаватель! Занятия проходят интересно и продуктивно. Очень доволен результатом.',
+          ),
+          const SizedBox(height: 20),
+          _buildReview(
+            reviewer: 'Олег Олегович',
+            rating: 2,
+            comment: 'Отличный преподаватель! Занятия проходят интересно и продуктивно. Очень доволен результатом.',
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildReview({
+    required String reviewer,
+    required int rating,
+    required String comment,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          reviewer,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 5),
+        Row(
+          children: List.generate(5, (index) {
+            return Icon(
+              index < rating ? Icons.star : Icons.star_border,
+              color: Colors.yellow,
+            );
+          }),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          comment,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ],
     );
   }
 
@@ -249,59 +180,18 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
-          Text(
-            'Записаться на первый урок',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue.shade800,
-            ),
-          ),
+          _buildHeaderText('Записаться на первый урок'),
           const SizedBox(height: 10),
-          const Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Перый урок со скидкой ',
-                  style: TextStyle(fontSize: 16),
-                ),
-                TextSpan(
-                  text: '40% ',
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.redAccent,
-                  ),
-                ),
-                TextSpan(
-                  text: "500 руб.",
-                  style: TextStyle(
-                    fontSize: 16,
-                    decoration: TextDecoration.lineThrough,
-                    decorationColor: Colors.red,
-                    decorationThickness: 2,
-                  ),
-                ),
-                TextSpan(
-                  text: " 300 руб. ",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              ],
-            ),
-          ),
+          _buildDiscountText(),
           const SizedBox(height: 10),
           ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const PlaceholderWidget()),
-              );
-            },
+            onPressed: () => Navigator.pushNamed(
+              context,
+              '/signup',
+              arguments: true, // Передаем аргумент, что после регистрации нужно перейти на экран выбора предмета
+            ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue, // Цвет кнопки
+              backgroundColor: Colors.blue,
             ),
             child: const Text(
               'Записаться',
@@ -317,19 +207,49 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTextSection(
-      String text, {
-        TextStyle? style,
-        double fontSize = 16,
-        FontStyle? fontStyle,
-      }) {
+  Widget _buildDiscountText() {
+    return const Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(text: 'Первый урок со скидкой ', style: TextStyle(fontSize: 16)),
+          TextSpan(text: '40% ', style: TextStyle(fontSize: 22, color: Colors.redAccent)),
+          TextSpan(text: " 300 руб.", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          TextSpan(
+            text: "500 руб.",
+            style: TextStyle(
+              fontSize: 16,
+              decoration: TextDecoration.lineThrough,
+              decorationColor: Colors.red,
+              decorationThickness: 2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextSection(String text, {TextStyle? style}) {
     return Text(
       text,
-      style: style ??
-          TextStyle(
-            fontSize: fontSize,
-            fontStyle: fontStyle,
-          ),
+      style: style ?? const TextStyle(fontSize: 16),
+    );
+  }
+
+  Widget _buildHeaderText(String text, {double fontSize = 22}) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        color: Colors.blue.shade800,
+      ),
+    );
+  }
+
+  Widget _buildBodyText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 18),
     );
   }
 
@@ -346,10 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
           TextSpan(
             text: linkText,
             style: const TextStyle(color: Colors.blue),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                _launchURL(url);
-              },
+            recognizer: TapGestureRecognizer()..onTap = () => _launchURL(url),
           ),
         ],
       ),
@@ -357,8 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
       throw 'Could not launch $url';
     }
@@ -379,18 +296,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       child: child,
-    );
-  }
-}
-
-class PlaceholderWidget extends StatelessWidget {
-  const PlaceholderWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Заглушка')),
-      body: const Center(child: Text('Заглушка')),
     );
   }
 }

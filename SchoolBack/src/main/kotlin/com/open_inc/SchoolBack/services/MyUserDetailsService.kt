@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 class MyUserDetailsService(
     private val userRepository: UserRepository
 ): UserDetailsService {
-    override fun loadUserByUsername(username: String?): UserDetails {
+    override fun loadUserByUsername(username: String?): MyUserDetails {
         val user = userRepository.findByEmail(username)
         return MyUserDetails(user!!)
     }

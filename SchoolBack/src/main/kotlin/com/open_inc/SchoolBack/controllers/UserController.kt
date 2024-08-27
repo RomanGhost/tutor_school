@@ -17,9 +17,8 @@ class UserController(private val userService: UserService, private val jwtUtil: 
     fun getUser(@RequestParam email: String, @RequestHeader("Authorization") token: String): ResponseEntity<User> {
         val jwtToken = token.replace("Bearer ", "")
         val userEmail = jwtUtil.getUsernameFromToken(jwtToken)
-        println(userEmail)
 
-        if (userEmail == null || userEmail != email) {
+        if (userEmail != email) {
             return ResponseEntity(HttpStatus.UNAUTHORIZED)
         }
 

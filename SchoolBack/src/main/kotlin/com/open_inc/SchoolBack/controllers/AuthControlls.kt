@@ -7,6 +7,11 @@ import com.open_inc.SchoolBack.configs.MyUserDetails
 import com.open_inc.SchoolBack.dataclasses.auth.AuthResponse
 import com.open_inc.SchoolBack.dataclasses.auth.LoginRequest
 import com.open_inc.SchoolBack.dataclasses.auth.SignUpRequest
+import com.open_inc.SchoolBack.models.Lesson
+import com.open_inc.SchoolBack.models.UserSubject
+import com.open_inc.SchoolBack.services.LessonService
+import com.open_inc.SchoolBack.services.SubjectService
+import com.open_inc.SchoolBack.services.UserSubjectService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -20,7 +25,9 @@ import org.springframework.web.bind.annotation.*
 class AuthController(
     private val userService: UserService,
     private val jwtUtil: JWTUtil,
-    private val authenticationManager: AuthenticationManager
+    private val authenticationManager: AuthenticationManager,
+    private val userSubjectService: UserSubjectService,
+    private val subjectService: SubjectService
 ) {
 
     @PostMapping("/register")
@@ -33,7 +40,7 @@ class AuthController(
                 lastName = signUpRequest.lastName,
                 surname = signUpRequest.surname
             )
-            userService.saveUser(user)
+
 
             val jwtResponse = authenticateUser(LoginRequest(user.email, user.password))
             if (jwtResponse.statusCode == HttpStatus.OK) {

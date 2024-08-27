@@ -15,35 +15,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final AuthApi _apiService = AuthApi();
   UserForms userForms = UserForms.undefined();
 
-  Future<void> _submit() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      _formKey.currentState?.save();
-      User newUser = userForms.getUser();
-      try {
-        String? jwt = await _apiService.registerUser(newUser);
-        if (jwt != null) {
-          // Сохранение JWT в локальное хранилище
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('jwt', jwt);
-          // Перенаправление на домашнюю страницу
-          Navigator.pushNamed(context, '/account');
-        } else {
-          // Показ ошибки
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to register')),
-          );
-        }
-      } catch (e) {
-        print(e);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration failed: $e')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Получаем аргументы из Navigator
+    final bool goToSubjectSelection = ModalRoute.of(context)?.settings.arguments as bool? ?? false;
+
+    Future<void> _submit() async {
+      if (_formKey.currentState?.validate() ?? false) {
+        _formKey.currentState?.save();
+        User newUser = userForms.getUser();
+        try {
+          String? jwt = await _apiService.registerUser(newUser);
+          if (jwt != null) {
+            // Сохранение JWT в локальное хранилище
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setString('jwt', jwt);
+
+            // Проверка необходимости перехода на экран выбора предмета
+            if (goToSubjectSelection) {
+              Navigator.pushNamed(context, '/enroll_subject');
+            } else {
+              Navigator.pushNamed(context, '/account');
+            }
+          } else {
+            // Показ ошибки
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to register')),
+            );
+          }
+        } catch (e) {
+          print(e);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Registration failed: $e')),
+          );
+        }
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Register'),

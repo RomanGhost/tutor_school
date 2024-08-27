@@ -95,6 +95,11 @@ class _SideMenuState extends State<SideMenu> {
                 onTap: () => _navigateTo(context, '/profile'),
               ),
               _buildListTile(
+                icon: Icons.label,
+                title: 'Lessons',
+                onTap: () => _navigateTo(context, '/user-lesson'),
+              ),
+              _buildListTile(
                 icon: Icons.logout,
                 title: 'Logout',
                 onTap: () => _logout(context),

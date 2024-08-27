@@ -5,7 +5,7 @@ import 'package:school/service/jwt_work.dart';
 import '../dataclasses/user.dart';
 import 'api_interface.dart';
 
-class AuthApi implements Api{
+class AuthApi extends Api{
   final String _baseUrl = 'http://localhost:8080/api/auth'; // Замените на ваш IP
   String? _jwt;
 

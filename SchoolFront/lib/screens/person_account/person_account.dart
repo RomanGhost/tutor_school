@@ -5,7 +5,6 @@ import 'package:school/widgets/side_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
-import '../../api/auth_api.dart';
 import '../../dataclasses/user.dart';
 import '../../widgets/next_lesson_widget.dart';
 
