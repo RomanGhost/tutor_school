@@ -29,5 +29,9 @@ data class User(
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
+
+    @ManyToOne
+    @JoinColumn(name="user_role", nullable = false)
+    var role: Role
 )

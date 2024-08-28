@@ -6,6 +6,8 @@ class User {
   String _surname;
   String _email;
   String _password;
+  String _role;
+
 
   // Constructors
   User.undefined()
@@ -13,7 +15,8 @@ class User {
         _lastName = '',
         _surname = '',
         _email = '',
-        _password = '';
+        _password = '',
+        _role='USER';
 
   User({
     required String email,
@@ -21,11 +24,13 @@ class User {
     required String firstName,
     required String lastName,
     String surname = '',
+    String role = 'USER',
   })  : _email = _validateEmail(email),
         _password = password??"", // Assuming password validation is commented out
         _firstName = _validateName(firstName, 'First name'),
         _lastName = _validateName(lastName, 'Last name'),
-        _surname = surname;
+        _surname = surname,
+        _role=role;
 
   // Getters
   String get firstName => _firstName;
@@ -33,11 +38,17 @@ class User {
   String get surname => _surname;
   String get email => _email;
   String get password => _password;
+  String get role => _role;
 
   // Setters with validation
   set firstName(String name) {
     _firstName = _validateName(name, 'First name');
   }
+
+  set role(String role) {
+    _role = role;
+  }
+
 
   set lastName(String name) {
     _lastName = _validateName(name, 'Last name');

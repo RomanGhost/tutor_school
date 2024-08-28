@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface UserSubjectRepository:JpaRepository<UserSubject, Int> {
-    fun findUserSubjectsByUserAndSubject(user: User, subject: Subject):UserSubject
+    fun findUserSubjectByUser(user:User):List<UserSubject>
+    fun findUserSubjectsByUserAndSubject(user: User, subject: Subject):List<UserSubject>
 }

@@ -3,6 +3,7 @@ import 'package:school/screens/auth/login_screen.dart';
 import 'package:school/screens/auth/register_screen.dart';
 import 'package:school/screens/person_account/edit_profile_screen.dart';
 import 'package:school/screens/person_account/person_account.dart';
+import 'package:school/screens/review/write_review_screen.dart';
 import 'package:school/screens/user_lesson/enroll_new_subject_screen.dart';
 import 'package:school/screens/user_lesson/subjects_screen.dart';
 
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         '/account':(context) => UserProfileScreen(),
         '/profile':(context) => EditProfileScreen(),
         '/enroll_subject':(context) => EnrollNewSubjectScreen(),
+        '/write-review': (context) => WriteReviewScreen(),
       },
     );
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school/api/lesson_api.dart';
+import 'package:school/api/subject_api.dart';
+import 'package:school/dataclasses/subject.dart';
 import '../dataclasses/lesson.dart';
 import 'subject_picker_widget.dart';
 
@@ -24,13 +26,26 @@ class BookingAndDetailWidget extends StatefulWidget {
 }
 
 class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
-  final List<String> _availableSubjects = const [
-    'Английский',
-  ];
+  SubjectApi subjectApi = SubjectApi();
+  List<Subject> _availableSubjects = [];
 
   final LessonApi _lessonApi = LessonApi();
   String? _selectedSubject;
   TimeOfDay? _selectedTime;
+
+  @override
+  void initState() {
+    super.initState();
+    // Инициализация списка доступных предметов
+    _initialize();
+  }
+
+  void _initialize() async {
+    List<Subject> loadedSubjects = await subjectApi.getUserSubjects();
+    setState(() {
+      _availableSubjects = loadedSubjects;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
 package com.open_inc.SchoolBack.services
 
+import com.open_inc.SchoolBack.models.Role
 import com.open_inc.SchoolBack.models.User
 import com.open_inc.SchoolBack.repositories.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -10,6 +11,9 @@ class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) {
+    fun getRoleByEmail(email: String):Role?{
+        return this.getUserByEmail(email)?.role
+    }
 
     fun saveUser(user: User): User {
         // Проверка уникальности email
@@ -25,7 +29,7 @@ class UserService(
         return userRepository.save(newUser)
     }
 
-    fun findUserByEmail(email: String): User? {
+    fun getUserByEmail(email: String): User? {
         return userRepository.findByEmail(email)
     }
 

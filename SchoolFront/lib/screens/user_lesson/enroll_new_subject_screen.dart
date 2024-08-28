@@ -19,9 +19,10 @@ class _EnrollNewSubjectScreenState extends State<EnrollNewSubjectScreen> {
   }
 
   void _initialize() async {
-    this.availableSubjects = await subjectApi.getSubjects();
-    for(var availableSubject in availableSubjects)
-      print(availableSubject);
+    List<Subject> loadedSubjects = await subjectApi.getAvailableSubjects();
+    setState(() {
+      availableSubjects = loadedSubjects;
+    });
   }
 
   @override

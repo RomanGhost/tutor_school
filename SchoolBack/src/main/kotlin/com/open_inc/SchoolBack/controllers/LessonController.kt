@@ -34,7 +34,6 @@ class LessonController (
             )
             returnLessons.add(returnLesson)
         }
-//        val res = ResponseEntity.ok(returnLessons)
         return ResponseEntity.ok(returnLessons)
     }
 
@@ -42,7 +41,7 @@ class LessonController (
     fun addLesson(@RequestHeader("Authorization") token: String, @RequestBody lesson: LessonData): ResponseEntity<LessonData> {
         val jwtToken = token.replace("Bearer ", "")
         val userEmail = jwtUtil.getUsernameFromToken(jwtToken)
-        val user = userService.findUserByEmail(userEmail)
+        val user = userService.getUserByEmail(userEmail)
 
         val subject = subjectService.getSubjectByName(lesson.subject)
         //TODO "Сделать обработку ошибки с предметом"
@@ -50,7 +49,7 @@ class LessonController (
 
         val status = statusService.getStatusByName(lesson.status)
 
-        val newLesson = Lesson(userSubject=userSubject, status=status, plainDateTime = lesson.plainDateTime)
+        val newLesson = Lesson(userSubject=userSubject!!, status=status, plainDateTime = lesson.plainDateTime)
 //        println(returnLesson)
 
         val returnLesson = lessonService.addLesson(newLesson)

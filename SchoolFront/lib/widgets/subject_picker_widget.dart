@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:school/dataclasses/subject.dart';
 
 class SubjectPickerWidget extends StatelessWidget {
-  final List<String> subjects;
+  final List<Subject> subjects;
   final String? selectedSubject;
   final ValueChanged<String?> onSubjectSelected;
 
@@ -16,15 +17,24 @@ class SubjectPickerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
       decoration: const InputDecoration(labelText: "Выберите предмет"),
-      value: subjects.firstOrNull ?? selectedSubject,
-      //TODO Сделать опцию другой
-      items: subjects.map((subject) {
-        return DropdownMenuItem<String>(
-          value: subject,
-          child: Text("$subject язык"),
-        );
-      }).toList(),
+      value: _getSelectedValue(),
+      items: _buildDropdownMenuItems(),
       onChanged: onSubjectSelected,
     );
+  }
+
+  /// Получение текущего значения для выпадающего списка.
+  String? _getSelectedValue() {
+    return subjects.firstOrNull?.name ?? selectedSubject;
+  }
+
+  /// Создание элементов для выпадающего списка.
+  List<DropdownMenuItem<String>> _buildDropdownMenuItems() {
+    return subjects.map((subject) {
+      return DropdownMenuItem<String>(
+        value: subject.name,
+        child: Text("${subject.toString()}"),
+      );
+    }).toList();
   }
 }

@@ -3,8 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/auth_api.dart';
 import '../../dataclasses/user.dart';
-import '../person_account/person_account.dart';
-import '../auth/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -42,7 +40,6 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       _showErrorSnackbar('An error occurred during login');
-      // Логирование ошибки может быть добавлено здесь
     }
   }
 
@@ -52,8 +49,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _navigateToUserProfile() {
-    Navigator.pushNamed(context, '/account');
+    final routeName = ModalRoute.of(context)?.settings.name;
+    if (routeName == '/write-review') {
+      Navigator.pushNamed(context, '/write-review');
+    } else {
+      Navigator.pushNamed(context, '/account');
+    }
   }
+
 
   void _showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -63,29 +66,36 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Login')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 400),
-            child: Card(
-              elevation: 8,
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
-                      _buildEmailField(),
-                      SizedBox(height: 16),
-                      _buildPasswordField(),
-                      SizedBox(height: 24),
-                      _buildLoginButton(),
-                      SizedBox(height: 8),
-                      _buildRegisterButton(),
-                    ],
+    return WillPopScope(
+      onWillPop: () async {
+        // Перенаправление на главную страницу
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+        return false; // Предотвращаем стандартное поведение "Назад"
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text('Login')),
+        body: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(16.0),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 400),
+              child: Card(
+                elevation: 8,
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        _buildEmailField(),
+                        SizedBox(height: 16),
+                        _buildPasswordField(),
+                        SizedBox(height: 24),
+                        _buildLoginButton(),
+                        SizedBox(height: 8),
+                        _buildRegisterButton(),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -109,6 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
       },
     );
   }
+
 
   Widget _buildPasswordField() {
     return TextFormField(

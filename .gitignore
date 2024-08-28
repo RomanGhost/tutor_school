@@ -11,6 +11,7 @@
 migrate_working_dir/
 .idea/
 .gradle/
+build/
 
 # IntelliJ related
 *.iml

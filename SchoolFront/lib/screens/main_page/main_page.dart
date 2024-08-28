@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'package:school/screens/review/write_review_screen.dart'; // Импорт экрана написания отзыва
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -121,7 +125,18 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeaderText('Отзыв:'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildHeaderText('Отзывы:'),
+              const SizedBox(width: 10,),
+              IconButton(
+                onPressed: _handleWriteReview,
+                icon: Icon(Icons.add, color:Colors.blue.shade800),
+                // child: const Text('Написать отзыв'),
+              ),
+        ]
+          ),
           const SizedBox(height: 10),
           _buildReview(
             reviewer: 'Роман Романович',
@@ -140,6 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
             rating: 2,
             comment: 'Отличный преподаватель! Занятия проходят интересно и продуктивно. Очень доволен результатом.',
           ),
+          // const SizedBox(height: 20),
+
         ],
       ),
     );
@@ -187,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pushNamed(
               context,
-              '/signup',
+              '/enroll_subject',
               arguments: true, // Передаем аргумент, что после регистрации нужно перейти на экран выбора предмета
             ),
             style: ElevatedButton.styleFrom(
@@ -273,29 +290,42 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _launchURL(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
   Widget _buildContainer({required Widget child}) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(
             color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, 5),
+            blurRadius: 4,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: child,
     );
+  }
+
+  Future<void> _handleWriteReview() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jwt = prefs.getString('jwt');
+
+    if (jwt == null || JwtDecoder.isExpired(jwt)) {
+      // Если нет токена или он истек, перенаправляем на страницу логина
+      Navigator.pushNamed(context, '/login', arguments: {'redirect': '/write-review'});
+    } else {
+      // Иначе перенаправляем на страницу написания отзыва
+      Navigator.pushNamed(context, '/write-review');
+    }
+  }
+
+  Future<void> _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Не удалось открыть ссылку $url';
+    }
   }
 }

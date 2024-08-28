@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:school/widgets/side_menu.dart'; // Импорт виджета бокового меню
 import 'package:school/screens/user_lesson/subject_card.dart';
+import '../../api/subject_api.dart';
 import '../../dataclasses/subject.dart';
-import 'enroll_new_subject_screen.dart';
 
 class SubjectsScreen extends StatefulWidget {
   const SubjectsScreen({super.key});
@@ -12,24 +12,27 @@ class SubjectsScreen extends StatefulWidget {
 }
 
 class _SubjectsScreenState extends State<SubjectsScreen> {
-  late List<Subject> subjects;
+  List<Subject> subjects = [];
+  SubjectApi subjectApi = SubjectApi();
 
   @override
   void initState() {
     super.initState();
-    subjects = _initializeSubjects();
+    _initializeSubjects();
   }
 
-  List<Subject> _initializeSubjects() {
-    return [
-      Subject(id: 1, name: 'Английский', price: 1505, level: 'B2'),
-      Subject(id: 2, name: 'Немецкий', price: 1200, level: 'A1'),
-    ];
+  void _initializeSubjects() async {
+    List<Subject> loadedSubjects = await subjectApi.getUserSubjects();
+    setState(() {
+      subjects = loadedSubjects;
+    });
   }
 
   void _onCancel(int subjectId) {
+    Subject delSubject = subjects.where((subject) => subject.id == subjectId).first;
+    subjectApi.deleteUserSubject(delSubject);
     setState(() {
-      subjects.removeWhere((subject) => subject.id == subjectId);
+      subjects.remove(delSubject);
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Запись на предмет с ID: $subjectId отменена')),
@@ -44,7 +47,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Мои Предметы'),
+        title: const Text('Мои предметы'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),

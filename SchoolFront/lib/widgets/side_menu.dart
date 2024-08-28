@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../api/auth_api.dart';
 import '../api/user_api.dart';
 import '../dataclasses/user.dart';
 
@@ -14,7 +13,7 @@ class SideMenu extends StatefulWidget {
 }
 
 class _SideMenuState extends State<SideMenu> {
-  late final Future<User> _userFuture;
+  late Future<User> _userFuture;
   final UserApi _apiService = UserApi();
 
   @override
@@ -42,12 +41,16 @@ class _SideMenuState extends State<SideMenu> {
 
     final user = await _apiService.getUser(email);
     if (user != null) {
+      //   final email = decodedToken['sub'] as String?;
+      final role = decodedToken['role']['authority'] as String;
+      user.role = role;
       return user;
     } else {
       // Handle the case where user data couldn't be fetched
       return User.undefined();
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -68,30 +71,40 @@ class _SideMenuState extends State<SideMenu> {
             children: [
               DrawerHeader(
                 decoration: const BoxDecoration(
-                  color: Colors.indigoAccent,
+                  color: Colors.blue,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                      Text(
+                        user.firstName.isNotEmpty ? user.firstName : 'Guest',
+                        style: const TextStyle(color: Colors.white, fontSize: 24),
+                      ),
+                      Text(
+                        user.email.isNotEmpty ? user.email : 'No email',
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    if(user.role != 'USER')
                     Text(
-                      user.firstName.isNotEmpty ? user.firstName : 'Guest',
-                      style: const TextStyle(color: Colors.white, fontSize: 24),
-                    ),
-                    Text(
-                      user.email.isNotEmpty ? user.email : 'No email',
+                      user.role.isNotEmpty ? user.role : 'No role',
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ],
                 ),
               ),
+              // _buildListTile(
+              //   icon: Icons.home,
+              //   title: 'Home',
+              //   onTap: () => _navigateTo(context, '/'),
+              // ),
               _buildListTile(
-                icon: Icons.home,
-                title: 'Home',
+                icon: Icons.person,
+                title: 'Home page',
                 onTap: () => _navigateTo(context, '/account'),
               ),
               _buildListTile(
-                icon: Icons.person,
-                title: 'Profile',
+                icon: Icons.person_pin_outlined,
+                title: 'Edit profile',
                 onTap: () => _navigateTo(context, '/profile'),
               ),
               _buildListTile(
@@ -99,6 +112,18 @@ class _SideMenuState extends State<SideMenu> {
                 title: 'Lessons',
                 onTap: () => _navigateTo(context, '/user-lesson'),
               ),
+              if (user.role == 'TEACHER') ...[
+                _buildListTile(
+                  icon: Icons.school,
+                  title: 'Ученики',
+                  onTap: () => _navigateTo(context, '/students'),
+                ),
+                _buildListTile(
+                  icon: Icons.book,
+                  title: 'Уроки',
+                  onTap: () => _navigateTo(context, '/lessons'),
+                ),
+              ],
               _buildListTile(
                 icon: Icons.logout,
                 title: 'Logout',
@@ -127,11 +152,9 @@ class _SideMenuState extends State<SideMenu> {
     Navigator.pushNamed(context, route);
   }
 
-  void _logout(BuildContext context) {
-    // Implement logout logic, such as clearing JWT and navigating to the login screen
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.remove('jwt');
-      Navigator.pushReplacementNamed(context, '/login');
-    });
+  void _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt');
+    Navigator.pushReplacementNamed(context, '/login');
   }
 }

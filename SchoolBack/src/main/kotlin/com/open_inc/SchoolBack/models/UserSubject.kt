@@ -17,6 +17,9 @@ data class UserSubject(
     @JoinColumn(name = "user_id", nullable = false)
     val user: User,
 
+    @Column(name = "is_visible", nullable = false)
+    var isVisible: Boolean = true,
+
     @ManyToOne
     @JoinColumn(name = "level_id", nullable = false)
     val level: Level

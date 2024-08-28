@@ -1,5 +1,6 @@
 package com.open_inc.SchoolBack.configs
 
+import com.open_inc.SchoolBack.services.UserService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -18,7 +19,7 @@ class JWTUtil {
 
     fun generateToken(userDetails: MyUserDetails): String {
         val claims: MutableMap<String, Any> = HashMap()
-        claims["role"] = userDetails.authorities.firstOrNull() ?: SimpleGrantedAuthority("User")
+        claims["role"] = userDetails.authorities.firstOrNull() ?: SimpleGrantedAuthority("USER")
         return doGenerateToken(claims, userDetails.username)
     }
 

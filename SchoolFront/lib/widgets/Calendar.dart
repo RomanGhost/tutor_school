@@ -21,41 +21,42 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
     _initializeLessons();
   }
 
+  /// Инициализация уроков, получение данных с API и обновление уведомлений.
   void _initializeLessons() async {
     try {
-      final List<Lesson> lessons = await _lessonApi.getLessons();
-      final Map<DateTime, List<Lesson>> resultLessons = {};
-
-      for (var lesson in lessons) {
-        final DateTime date = DateTime.utc(lesson.time.year, lesson.time.month, lesson.time.day);
-        if (resultLessons.containsKey(date)) {
-          resultLessons[date]!.add(lesson);
-        } else {
-          resultLessons[date] = [lesson];
-        }
-      }
-
-      _lessonsNotifier.value = resultLessons;
+      final lessons = await _lessonApi.getLessons();
+      _lessonsNotifier.value = _groupLessonsByDate(lessons);
     } catch (e) {
-      // Handle any errors
+      // Обработка ошибок
       print('Failed to initialize lessons: $e');
     }
   }
 
-  List<Lesson> _getLessonsForDay(DateTime day) {
-    return _lessonsNotifier.value[day] ?? [];
+  /// Группировка уроков по датам.
+  Map<DateTime, List<Lesson>> _groupLessonsByDate(List<Lesson> lessons) {
+    final resultLessons = <DateTime, List<Lesson>>{};
+    for (var lesson in lessons) {
+      final date = DateTime.utc(lesson.time.year, lesson.time.month, lesson.time.day);
+      resultLessons[date] = (resultLessons[date] ?? [])..add(lesson);
+    }
+    return resultLessons;
   }
 
+  /// Получение уроков для определенного дня.
+  List<Lesson> _getLessonsForDay(DateTime day) => _lessonsNotifier.value[day] ?? [];
+
+  /// Обработка выбора дня в календаре.
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    _selectedDayNotifier.value = selectedDay;
     setState(() {
-      _selectedDayNotifier.value = selectedDay;
       _focusedDay = focusedDay;
     });
     _showBookingAndDetailWidget(selectedDay);
   }
 
+  /// Отображение модального окна с деталями и возможностью бронирования.
   void _showBookingAndDetailWidget(DateTime day) {
-    final bool allowAdding = day.isAfter(DateTime.now()) || isSameDay(day, DateTime.now());
+    final allowAdding = day.isAfter(DateTime.now()) || _isSameDay(day, DateTime.now());
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -69,6 +70,7 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
     );
   }
 
+  /// Удаление урока.
   void _deleteLesson(DateTime day, int lessonId) {
     final lessons = _lessonsNotifier.value[day];
     if (lessons != null) {
@@ -79,21 +81,20 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
           if (lessons.isEmpty) {
             _lessonsNotifier.value.remove(day);
           }
-          _lessonsNotifier.value = Map.from(_lessonsNotifier.value); // Notify listeners
+          _lessonsNotifier.value = Map.from(_lessonsNotifier.value); // Уведомление слушателей
         });
       }
     }
   }
 
+  /// Добавление нового урока.
   void _addLesson(DateTime day, Lesson lesson) {
-    setState(() {
-      final lessons = _lessonsNotifier.value[day] ?? [];
-      lessons.add(lesson);
-      _lessonsNotifier.value = {
-        ..._lessonsNotifier.value,
-        day: lessons,
-      };
-    });
+    final lessons = _lessonsNotifier.value[day] ?? [];
+    lessons.add(lesson);
+    _lessonsNotifier.value = {
+      ..._lessonsNotifier.value,
+      day: lessons,
+    };
   }
 
   @override
@@ -111,23 +112,29 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
         return ValueListenableBuilder<Map<DateTime, List<Lesson>>>(
           valueListenable: _lessonsNotifier,
           builder: (context, lessonMap, __) {
-            return TableCalendar(
-              firstDay: DateTime.utc(2024, 1, 1),
-              lastDay: DateTime.utc(2024, 12, 31),
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) => isSameDay(selectedDay, day),
-              onDaySelected: _onDaySelected,
-              eventLoader: _getLessonsForDay,
-              startingDayOfWeek: StartingDayOfWeek.monday,
-              calendarStyle: _buildCalendarStyle(),
-              headerStyle: _buildHeaderStyle(),
-            );
+            return _buildCalendar(selectedDay);
           },
         );
       },
     );
   }
 
+  /// Создание виджета календаря.
+  Widget _buildCalendar(DateTime selectedDay) {
+    return TableCalendar(
+      firstDay: DateTime.utc(2024, 1, 1),
+      lastDay: DateTime.utc(2024, 12, 31),
+      focusedDay: _focusedDay,
+      selectedDayPredicate: (day) => _isSameDay(selectedDay, day),
+      onDaySelected: _onDaySelected,
+      eventLoader: _getLessonsForDay,
+      startingDayOfWeek: StartingDayOfWeek.monday,
+      calendarStyle: _buildCalendarStyle(),
+      headerStyle: _buildHeaderStyle(),
+    );
+  }
+
+  /// Стиль календаря.
   CalendarStyle _buildCalendarStyle() {
     return CalendarStyle(
       markerDecoration: BoxDecoration(
@@ -160,6 +167,7 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
     );
   }
 
+  /// Стиль заголовка календаря.
   HeaderStyle _buildHeaderStyle() {
     return HeaderStyle(
       formatButtonVisible: false,
@@ -171,7 +179,8 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
     );
   }
 
-  bool isSameDay(DateTime day1, DateTime day2) {
+  /// Проверка на одинаковый день.
+  bool _isSameDay(DateTime day1, DateTime day2) {
     return day1.year == day2.year && day1.month == day2.month && day1.day == day2.day;
   }
 }

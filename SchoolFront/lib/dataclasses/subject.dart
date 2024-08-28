@@ -15,4 +15,8 @@ class Subject {
     required this.name,
     required this.price
   }):_level=level;
+
+  String toString(){
+    return "${name}";
+  }
 }
