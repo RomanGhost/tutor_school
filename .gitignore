@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/SchoolBack/out/production/resources/application.properties
+/SchoolBack/out/production/classes/META-INF/School.kotlin_module
+/SchoolBack/out/test/classes/META-INF/School_test.kotlin_module

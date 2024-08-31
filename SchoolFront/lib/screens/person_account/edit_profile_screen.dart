@@ -44,10 +44,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final result = await _apiService.updateUserProfile(updateUser);
       if (result) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile updated successfully')),
+          SnackBar(content: Text('Профиль обновлен успешно')),
         );
       } else {
-        _showErrorSnackbar('Failed to update profile');
+        _showErrorSnackbar('Обновить не получилось');
       }
     }
   }
@@ -68,7 +68,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: const Text('Настройки'),
       ),
       drawer: SideMenu(), // Добавление боковой панели
       body: FutureBuilder<User?>(
@@ -114,7 +114,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             );
           } else {
-            return const Center(child: Text('User data not found.'));
+            return const Center(child: Text('Данные пользователя не найдены'));
           }
         },
       ),
@@ -131,7 +131,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      child: const Text('Save Changes',
+      child: const Text('Сохранить изменения',
         style: TextStyle(
           color: Colors.white,
         ),

@@ -13,14 +13,14 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final AuthApi _apiService = AuthApi();
-  UserForms userForms = UserForms.undefined();
+  final UserForms userForms = UserForms.undefined();
 
   @override
   Widget build(BuildContext context) {
     Future<void> _submit() async {
       if (_formKey.currentState?.validate() ?? false) {
         _formKey.currentState?.save();
-        User newUser = userForms.getUser();
+        User newUser = userForms.getUser(checkPassword: true);
         try {
           String? jwt = await _apiService.registerUser(newUser);
           if (jwt != null) {
@@ -37,13 +37,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           } else {
             // Показ ошибки
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to register')),
+              SnackBar(content: Text('Не смогли зарегестрировать')),
             );
           }
         } catch (e) {
           print(e);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Registration failed: $e')),
+            SnackBar(content: Text('Регистрация с ошибкой: $e')),
           );
         }
       }

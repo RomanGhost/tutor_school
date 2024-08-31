@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/auth_api.dart';
 import '../../dataclasses/user.dart';
+import '../forms/user_forms.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -10,10 +11,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final AuthApi _apiService = AuthApi();
+  final UserForms userForms = UserForms.undefined();
 
   @override
   void dispose() {
@@ -23,23 +24,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return;
+
+    final user = userForms.getUserLogin();
+    print("${user.email} ${user.password}");
 
     try {
-      final user = User.undefined();
-      user.email = _emailController.text.trim();
-      user.password = _passwordController.text.trim();
-
       final jwt = await _apiService.authenticateUser(user);
 
       if (jwt != null) {
         await _storeJwt(jwt);
         _navigateToUserProfile();
       } else {
-        _showErrorSnackbar('Failed to login');
+        _showErrorSnackbar('Ошибка авторизации');
       }
     } catch (e) {
-      _showErrorSnackbar('An error occurred during login');
+      _showErrorSnackbar('Произошла ошибка на одном из этапов');
     }
   }
 
@@ -73,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return false; // Предотвращаем стандартное поведение "Назад"
       },
       child: Scaffold(
-        appBar: AppBar(title: Text('Login')),
+        appBar: AppBar(title: const Text('Авторизация')),
         body: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(16.0),
@@ -84,12 +83,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Form(
-                    key: _formKey,
                     child: Column(
                       children: <Widget>[
-                        _buildEmailField(),
+                        userForms.buildEmailNameField(),
                         SizedBox(height: 16),
-                        _buildPasswordField(),
+                        userForms.buildPasswordField(),
                         SizedBox(height: 24),
                         _buildLoginButton(),
                         SizedBox(height: 8),
@@ -103,35 +101,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildEmailField() {
-    return TextFormField(
-      controller: _emailController,
-      decoration: InputDecoration(labelText: 'Email'),
-      keyboardType: TextInputType.emailAddress,
-      validator: (value) {
-        if (value == null || value.isEmpty || !value.contains('@')) {
-          return 'Please enter a valid email';
-        }
-        return null;
-      },
-    );
-  }
-
-
-  Widget _buildPasswordField() {
-    return TextFormField(
-      controller: _passwordController,
-      decoration: InputDecoration(labelText: 'Password'),
-      obscureText: true,
-      validator: (value) {
-        if (value == null || value.isEmpty || value.length < 6) {
-          return 'Password must be at least 6 characters long';
-        }
-        return null;
-      },
     );
   }
 
@@ -155,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
       onPressed: () {
         Navigator.pushNamed(context, '/signup');
       },
-      child: Text('Don\'t have an account? Register'),
+      child: Text('Зарегестрироваться'),
     );
   }
 }

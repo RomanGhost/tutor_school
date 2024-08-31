@@ -95,17 +95,17 @@ class _SideMenuState extends State<SideMenu> {
                     ),
                     _buildListTile(
                       icon: Icons.person,
-                      title: 'Home page',
+                      title: 'Главная',
                       onTap: () => _navigateTo(context, '/account'),
                     ),
                     _buildListTile(
-                      icon: Icons.person_pin_outlined,
-                      title: 'Edit profile',
+                      icon: Icons.settings,
+                      title: 'Настройки',
                       onTap: () => _navigateTo(context, '/profile_edit'),
                     ),
                     _buildListTile(
                       icon: Icons.label,
-                      title: 'Lessons',
+                      title: 'Предметы',
                       onTap: () => _navigateTo(context, '/user_lesson'),
                     ),
                     if (user.role == 'TEACHER') ...[
@@ -125,7 +125,7 @@ class _SideMenuState extends State<SideMenu> {
               ),
               _buildListTile(
                 icon: Icons.logout,
-                title: 'Logout',
+                title: 'Выйти',
                 onTap: () => _logout(context),
               ),
             ],

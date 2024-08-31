@@ -52,9 +52,17 @@ class UserForms{
       newUser.password = _passwordController.text;
     }else{
       if(checkPassword)
-        throw PasswordError("Passwords do not match");
+        throw PasswordError("Пароли не совпадают");
     }
     return newUser;
+  }
+
+  User getUserLogin(){
+    User loginUser = User.undefined();
+    loginUser.email = _emailController.text;
+    loginUser.password = _passwordController.text;
+
+    return loginUser;
   }
 
   Widget buildEmailNameField() {
@@ -67,11 +75,17 @@ class UserForms{
         ),
       ),
       validator: (value) {
+        const emailPattern = r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+$";
+        final emailRegex = RegExp(emailPattern);
+        final formattedEmail = value.toString().toLowerCase();
         if (value == null || value.isEmpty) {
-          return 'Please enter your email';
+          return 'Введи email';
         }
         if (value.length < 3) {
-          return 'Name must be at least 3 characters long';
+          return 'Длина должна быть больше 3 символов';
+        }
+        if(!emailRegex.hasMatch(formattedEmail)){
+          return 'Почта неверна';
         }
         return null;
       },
@@ -82,17 +96,17 @@ class UserForms{
     return TextFormField(
       controller: _firstNameController,
       decoration: InputDecoration(
-        labelText: 'Name',
+        labelText: 'Имя',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter your name';
+          return 'Имя';
         }
         if (value.length < 3) {
-          return 'Name must be at least 3 characters long';
+          return 'Длина должна быть больше 3 символов';
         }
         return null;
       },
@@ -103,20 +117,11 @@ class UserForms{
     return TextFormField(
       controller: _surnameController,
       decoration: InputDecoration(
-        labelText: 'Surname',
+        labelText: 'Отчество',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your surname';
-        }
-        if (value.length < 3) {
-          return 'Name must be at least 3 characters long';
-        }
-        return null;
-      },
     );
   }
 
@@ -124,17 +129,17 @@ class UserForms{
     return TextFormField(
       controller: _lastNameController,
       decoration: InputDecoration(
-        labelText: 'Last name',
+        labelText: 'Фамилия',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter last name';
+          return "Введи фамилию";
         }
         if (value.length < 3) {
-          return 'Name must be at least 3 characters long';
+          return "Длина должна быть больше 3 символов";
         }
         return null;
       },
@@ -145,7 +150,7 @@ class UserForms{
     return TextFormField(
       controller: _passwordController,
       decoration: InputDecoration(
-        labelText: 'New Password',
+        labelText: 'Пароль',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -153,7 +158,7 @@ class UserForms{
       obscureText: true,
       validator: (value) {
         if (value != null && value.isNotEmpty && value.length<6) {
-          return 'Password must be at least 6 characters long';
+          return 'PПароль должен быть больше 6 символов';
         }
         return null;
       },
@@ -164,7 +169,7 @@ class UserForms{
     return TextFormField(
       controller: _confirmPasswordController,
       decoration: InputDecoration(
-        labelText: 'Confirm New Password',
+        labelText: 'Подтверждение пароля',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -172,7 +177,7 @@ class UserForms{
       obscureText: true,
       validator: (value) {
         if (_passwordController.text.isNotEmpty && value != _passwordController.text) {
-          return 'Passwords do not match';
+          return 'Пароли не совпадают';
         }
         return null;
       },

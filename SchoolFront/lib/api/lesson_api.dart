@@ -99,12 +99,11 @@ class LessonApi extends Api {
         for (var lessonJson in result) {
           // Преобразуем время в UTC и затем в локальное время
           DateTime utcTime = DateTime.parse(lessonJson['plainDateTime']).toUtc();
-          DateTime localTime = utcTime.toLocal();
 
           Lesson newLesson = Lesson(
               id: lessonJson['id'],
               title: lessonJson['subject'],
-              time: localTime, // Сохраняем в локальном времени
+              time: utcTime, // Сохраняем в локальном времени
               status: lessonJson['status']);
           resultLessons.add(newLesson);
         }
@@ -139,12 +138,11 @@ class LessonApi extends Api {
 
         // Преобразуем время в UTC и затем в локальное время
         DateTime utcTime = DateTime.parse(lessonJson['plainDateTime']).toUtc();
-        DateTime localTime = utcTime.toLocal();
 
         Lesson nextLesson = Lesson(
           id: lessonJson['id'],
           title: lessonJson['subject'],
-          time: localTime, // Сохраняем в локальном времени
+          time: utcTime, // Сохраняем в локальном времени
           status: lessonJson['status'],
         );
 
@@ -184,12 +182,11 @@ class LessonApi extends Api {
 
         // Преобразуем время в UTC и затем в локальное время
         DateTime utcTime = DateTime.parse(lessonJson['plainDateTime']).toUtc();
-        DateTime localTime = utcTime.toLocal();
 
         Lesson newLesson = Lesson(
           id: lessonJson['id'],
           title: lessonJson['subject'],
-          time: localTime, // Сохраняем в локальном времени
+          time: utcTime, // Сохраняем в локальном времени
           status: lessonJson['status'],
         );
         return newLesson;

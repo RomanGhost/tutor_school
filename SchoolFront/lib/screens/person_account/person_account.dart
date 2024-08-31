@@ -52,7 +52,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Profile'),
+        title: Text('Главная'),
       ),
       drawer: SideMenu(), // Добавление боковой панели
       body: _userData == null

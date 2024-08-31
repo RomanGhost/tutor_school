@@ -3,9 +3,9 @@
 
 class Lesson {
   late final int _id;
-  final String _title;
-  final DateTime _time;
-  final String _status;
+  late final String _title;
+  late final DateTime _time;
+  late final String _status;
 
   void set id(id) => _id=id;
 
@@ -14,7 +14,13 @@ class Lesson {
   DateTime get time => _time;
   String get status => _status;
 
-  Lesson({int id=0, required String title, required time, required status}) : _title = title, _time=time, _status=status, _id=id;
+  Lesson({int id=0, required String title, required DateTime time, required String status}) {
+    _title = title;
+    DateTime localTime = time.toLocal();
+    _time=localTime;
+    _status=status;
+    _id=id;
+  }
 
   @override
   String toString() {

@@ -170,16 +170,23 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 10), // Отступ между заголовком и первым отзывом
-          ..._reviews.map((review) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 15), // Промежуток между отзывами
-              child: _buildReview(review: review),
-            );
-          }).toList(),
+          SizedBox(
+            height: 300, // Задаем фиксированную высоту для секции с отзывами
+            child: ListView.builder(
+              itemCount: _reviews.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 15), // Промежуток между отзывами
+                  child: _buildReview(review: _reviews[index]),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
   }
+
 
 
   Widget _buildReview({
