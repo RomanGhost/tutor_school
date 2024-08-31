@@ -1,6 +1,6 @@
 package com.open_inc.SchoolBack.models
 
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import jakarta.persistence.*
 
 @Entity
@@ -18,8 +18,8 @@ data class TeacherProfile(
     val subject: Subject,
 
     @Column(name = "created_at")
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: OffsetDateTime = OffsetDateTime.now(),
 
     @Column(name = "updated_at")
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: OffsetDateTime = OffsetDateTime.now()
 )

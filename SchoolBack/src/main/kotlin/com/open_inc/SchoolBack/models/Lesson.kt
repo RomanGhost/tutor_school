@@ -1,6 +1,6 @@
 package com.open_inc.SchoolBack.models
 
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import jakarta.persistence.*
 
 @Entity
@@ -25,11 +25,14 @@ data class Lesson(
     val status: Status,
 
     @Column(name = "plain_datetime")
-    val plainDateTime: LocalDateTime? = null,
+    val plainDateTime: OffsetDateTime? = null,
 
     @Column(name = "created_at", nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: OffsetDateTime = OffsetDateTime.now(),
 
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: OffsetDateTime = OffsetDateTime.now(),
+
+    @Column(nullable=true)
+    var isVisible:Boolean = true,
 )

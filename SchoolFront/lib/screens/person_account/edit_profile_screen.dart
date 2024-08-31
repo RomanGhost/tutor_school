@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:school/api/user_api.dart';
 import 'package:school/errors/user_errors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../../dataclasses/user.dart';
 import '../../errors/jwt_errors.dart';
@@ -17,7 +17,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final UserApi _apiService = UserApi();
   final _formKey = GlobalKey<FormState>();
-  UserForms userForms = UserForms.undefined();
+  late UserForms userForms;
 
   Future<User?> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -70,7 +70,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       appBar: AppBar(
         title: const Text('Edit Profile'),
       ),
-      drawer: const SideMenu(), // Добавление боковой панели
+      drawer: SideMenu(), // Добавление боковой панели
       body: FutureBuilder<User?>(
         future: _loadUserData(),
         builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
@@ -80,24 +80,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData && snapshot.data != null) {
             userForms = UserForms(snapshot.data!);
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: ListView(
-                  children: <Widget>[
-                    userForms.buildFirstNameField(),
-                    const SizedBox(height: 20),
-                    userForms.buildLastNameField(),
-                    const SizedBox(height: 20),
-                    userForms.buildSurnameField(),
-                    const SizedBox(height: 20),
-                    userForms.buildPasswordField(),
-                    const SizedBox(height: 20),
-                    userForms.buildConfirmPasswordField(),
-                    const SizedBox(height: 20),
-                    _buildSaveButton(),
-                  ],
+            return Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 400),
+                  child: Card(
+                    elevation: 8,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            userForms.buildFirstNameField(),
+                            const SizedBox(height: 20),
+                            userForms.buildLastNameField(),
+                            const SizedBox(height: 20),
+                            userForms.buildSurnameField(),
+                            const SizedBox(height: 20),
+                            userForms.buildPasswordField(),
+                            const SizedBox(height: 20),
+                            userForms.buildConfirmPasswordField(),
+                            const SizedBox(height: 20),
+                            _buildSaveButton(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             );
@@ -113,12 +125,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return ElevatedButton(
       onPressed: _saveProfile,
       style: ElevatedButton.styleFrom(
+        backgroundColor: Color(0xFF6498E4),
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      child: const Text('Save Changes'),
+      child: const Text('Save Changes',
+        style: TextStyle(
+          color: Colors.white,
+        ),
+
+      ),
+
     );
   }
 }

@@ -4,8 +4,10 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="delegatedBuild" value="false" />
+        <option name="testRunner" value="PLATFORM" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/SchoolBack" />
-        <option name="gradleJvm" value="corretto-17" />
+        <option name="gradleJvm" value="corretto-17 (2)" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/SchoolBack" />
@@ -13,6 +15,5 @@
         </option>
       </GradleProjectSettings>
     </option>
-    <option name="parallelModelFetch" value="true" />
   </component>
 </project>

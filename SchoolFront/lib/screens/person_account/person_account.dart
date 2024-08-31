@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:school/api/user_api.dart';
 import 'package:school/errors/jwt_errors.dart';
 import 'package:school/widgets/side_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../../dataclasses/user.dart';
 import '../../widgets/next_lesson_widget.dart';

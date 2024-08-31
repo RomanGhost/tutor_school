@@ -17,9 +17,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Получаем аргументы из Navigator
-    final bool goToSubjectSelection = ModalRoute.of(context)?.settings.arguments as bool? ?? false;
-
     Future<void> _submit() async {
       if (_formKey.currentState?.validate() ?? false) {
         _formKey.currentState?.save();
@@ -31,8 +28,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             await prefs.setString('jwt', jwt);
 
-            // Проверка необходимости перехода на экран выбора предмета
-            if (goToSubjectSelection) {
+            final routeName = ModalRoute.of(context)?.settings.arguments;
+            if (routeName == '/enroll_subject') {
               Navigator.pushNamed(context, '/enroll_subject');
             } else {
               Navigator.pushNamed(context, '/account');
@@ -54,7 +51,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Register'),
+        title: Text('Регистрация'),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -84,7 +81,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _submit,
-                        child: Text('Register'),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF6498E4)
+                        ),
+                        child: const Text(
+                            'Зарегистрироваться',
+                          style: TextStyle(
+                              color: Colors.white
+                          ),
+                        ),
                       ),
                     ],
                   ),

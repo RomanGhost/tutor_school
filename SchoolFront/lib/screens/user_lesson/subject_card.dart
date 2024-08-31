@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../dataclasses/subject.dart';
 
 class SubjectCard extends StatelessWidget {
@@ -17,7 +18,7 @@ class SubjectCard extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Подтвердите удаление'),
-          content: Text('Вы уверены, что хотите отменить запись на предмет "${subject.name}"?'),
+          content: Text('Вы уверены, что хотите отменить запись на предмет "${subject.name}"?(Все будущие предметы удалятся)'),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),

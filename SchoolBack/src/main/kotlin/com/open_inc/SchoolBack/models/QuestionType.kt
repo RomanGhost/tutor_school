@@ -1,6 +1,6 @@
 package com.open_inc.SchoolBack.models
 
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import jakarta.persistence.*
 
 @Entity

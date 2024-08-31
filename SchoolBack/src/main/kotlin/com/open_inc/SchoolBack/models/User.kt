@@ -1,7 +1,7 @@
 package com.open_inc.SchoolBack.models
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 @Entity
 @Table(name = "User_App")
@@ -26,10 +26,10 @@ data class User(
     val password: String,
 
     @Column(name = "created_at", nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: OffsetDateTime = OffsetDateTime.now(),
 
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: OffsetDateTime = OffsetDateTime.now(),
 
     @ManyToOne
     @JoinColumn(name="user_role", nullable = false)

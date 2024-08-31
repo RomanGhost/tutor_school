@@ -28,11 +28,11 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomeScreen(),
         '/login': (context) => LoginScreen(),
         '/signup': (context) => RegisterScreen(),
-        '/user-lesson':(context) => SubjectsScreen(),
+        '/user_lesson':(context) => SubjectsScreen(),
         '/account':(context) => UserProfileScreen(),
-        '/profile':(context) => EditProfileScreen(),
+        '/profile_edit':(context) => EditProfileScreen(),
         '/enroll_subject':(context) => EnrollNewSubjectScreen(),
-        '/write-review': (context) => WriteReviewScreen(),
+        '/write_review': (context) => WriteReviewScreen(),
       },
     );
   }

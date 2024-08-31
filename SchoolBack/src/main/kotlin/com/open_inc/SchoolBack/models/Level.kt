@@ -1,6 +1,6 @@
 package com.open_inc.SchoolBack.models
 
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import jakarta.persistence.*
 
 @Entity
@@ -20,8 +20,8 @@ data class Level(
     val coefficient: Float? = null,
 
     @Column(name = "created_at", nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: OffsetDateTime = OffsetDateTime.now(),
 
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: OffsetDateTime = OffsetDateTime.now()
 )

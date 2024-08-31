@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school/api/lesson_api.dart';
 import 'package:table_calendar/table_calendar.dart';
+
 import '../dataclasses/lesson.dart';
 import 'booking_and_detail_widget.dart';
 
@@ -18,17 +19,16 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
   @override
   void initState() {
     super.initState();
-    _initializeLessons();
+    _initializeLessonsForMonth(_focusedDay); // Инициализация только для текущего месяца
   }
 
-  /// Инициализация уроков, получение данных с API и обновление уведомлений.
-  void _initializeLessons() async {
+  /// Инициализация уроков для выбранного месяца.
+  void _initializeLessonsForMonth(DateTime date) async {
     try {
-      final lessons = await _lessonApi.getLessons();
+      final lessons = await _lessonApi.getLessonsForMonth(date.year, date.month); // Запрос уроков за месяц
       _lessonsNotifier.value = _groupLessonsByDate(lessons);
     } catch (e) {
-      // Обработка ошибок
-      print('Failed to initialize lessons: $e');
+      print('Failed to initialize lessons for month: $e');
     }
   }
 
@@ -49,9 +49,24 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     _selectedDayNotifier.value = selectedDay;
     setState(() {
+      // Если выбранный день находится в другом месяце, загружаем уроки для этого месяца
+      if (focusedDay.month != _focusedDay.month || focusedDay.year != _focusedDay.year) {
+        _initializeLessonsForMonth(focusedDay);
+      }
       _focusedDay = focusedDay;
     });
     _showBookingAndDetailWidget(selectedDay);
+  }
+
+  /// Обработка изменения страницы в календаре.
+  void _onPageChanged(DateTime focusedDay) {
+    // Если изменился месяц, загружаем уроки для нового месяца
+    if (focusedDay.month != _focusedDay.month || focusedDay.year != _focusedDay.year) {
+      setState(() {
+        _focusedDay = focusedDay;
+      });
+      _initializeLessonsForMonth(focusedDay);
+    }
   }
 
   /// Отображение модального окна с деталями и возможностью бронирования.
@@ -112,31 +127,26 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
         return ValueListenableBuilder<Map<DateTime, List<Lesson>>>(
           valueListenable: _lessonsNotifier,
           builder: (context, lessonMap, __) {
-            return _buildCalendar(selectedDay);
+            return TableCalendar(
+              firstDay: DateTime.utc(2024, 1, 1),
+              lastDay: DateTime.utc(2024, 12, 31),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => _isSameDay(selectedDay, day),
+              onDaySelected: _onDaySelected,
+              onPageChanged: _onPageChanged, // Обработка смены месяца
+              eventLoader: _getLessonsForDay,
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              calendarStyle: _buildCalendarStyle(),
+              headerStyle: _buildHeaderStyle(),
+            );
           },
         );
       },
     );
   }
 
-  /// Создание виджета календаря.
-  Widget _buildCalendar(DateTime selectedDay) {
-    return TableCalendar(
-      firstDay: DateTime.utc(2024, 1, 1),
-      lastDay: DateTime.utc(2024, 12, 31),
-      focusedDay: _focusedDay,
-      selectedDayPredicate: (day) => _isSameDay(selectedDay, day),
-      onDaySelected: _onDaySelected,
-      eventLoader: _getLessonsForDay,
-      startingDayOfWeek: StartingDayOfWeek.monday,
-      calendarStyle: _buildCalendarStyle(),
-      headerStyle: _buildHeaderStyle(),
-    );
-  }
-
-  /// Стиль календаря.
   CalendarStyle _buildCalendarStyle() {
-    return CalendarStyle(
+    return const CalendarStyle(
       markerDecoration: BoxDecoration(
         color: Colors.orangeAccent,
         shape: BoxShape.circle,
@@ -167,9 +177,8 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
     );
   }
 
-  /// Стиль заголовка календаря.
   HeaderStyle _buildHeaderStyle() {
-    return HeaderStyle(
+    return const HeaderStyle(
       formatButtonVisible: false,
       titleCentered: true,
       titleTextStyle: TextStyle(
@@ -179,7 +188,6 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
     );
   }
 
-  /// Проверка на одинаковый день.
   bool _isSameDay(DateTime day1, DateTime day2) {
     return day1.year == day2.year && day1.month == day2.month && day1.day == day2.day;
   }

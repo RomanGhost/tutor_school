@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school/api/subject_api.dart';
+
 import '../../dataclasses/subject.dart';
 
 class EnrollNewSubjectScreen extends StatefulWidget {
@@ -74,14 +75,17 @@ class _EnrollNewSubjectScreenState extends State<EnrollNewSubjectScreen> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: Color(0xFF6498E4),
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       ),
                       onPressed: () {
                         subjectApi.addSubjectUser(subject);
-                        Navigator.pushNamed(context, '/user-lesson');
+                        Navigator.pushNamed(context, '/user_lesson');
                       },
-                      child: const Text('Записаться'),
+                      child: const Text('Записаться',
+                      style: TextStyle(
+                        color: Colors.white
+                      ),),
                     ),
                   ],
                 ),

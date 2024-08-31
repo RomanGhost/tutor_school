@@ -49,9 +49,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _navigateToUserProfile() {
-    final routeName = ModalRoute.of(context)?.settings.name;
-    if (routeName == '/write-review') {
-      Navigator.pushNamed(context, '/write-review');
+    final routeName = ModalRoute.of(context)?.settings.arguments;
+    if (routeName == '/write_review') {
+      Navigator.pushNamed(context, '/write_review');
     } else {
       Navigator.pushNamed(context, '/account');
     }
@@ -137,8 +137,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLoginButton() {
     return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+          backgroundColor: Color(0xFF6498E4)
+      ),
       onPressed: _login,
-      child: Text('Login'),
+      child: const Text(
+        'Войти',
+        style: TextStyle(
+          color: Colors.white
+        ),
+      ),
     );
   }
 

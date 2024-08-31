@@ -41,7 +41,6 @@ class _SideMenuState extends State<SideMenu> {
 
     final user = await _apiService.getUser(email);
     if (user != null) {
-      //   final email = decodedToken['sub'] as String?;
       final role = decodedToken['role']['authority'] as String;
       user.role = role;
       return user;
@@ -50,7 +49,6 @@ class _SideMenuState extends State<SideMenu> {
       return User.undefined();
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -66,64 +64,65 @@ class _SideMenuState extends State<SideMenu> {
 
           final user = snapshot.data ?? User.undefined();
 
-          return ListView(
-            padding: EdgeInsets.zero,
+          return Column(
             children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Colors.blue,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
                   children: [
-                      Text(
-                        user.firstName.isNotEmpty ? user.firstName : 'Guest',
-                        style: const TextStyle(color: Colors.white, fontSize: 24),
+                    DrawerHeader(
+                      decoration: BoxDecoration(
+                        color: Color(0xFF6498E4),
                       ),
-                      Text(
-                        user.email.isNotEmpty ? user.email : 'No email',
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.firstName.isNotEmpty ? user.firstName : 'Guest',
+                            style: const TextStyle(color: Colors.white, fontSize: 24),
+                          ),
+                          Text(
+                            user.email.isNotEmpty ? user.email : 'No email',
+                            style: const TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                          if (user.role != 'USER')
+                            Text(
+                              user.role.isNotEmpty ? user.role : 'No role',
+                              style: const TextStyle(color: Colors.white, fontSize: 14),
+                            ),
+                        ],
                       ),
-                    if(user.role != 'USER')
-                    Text(
-                      user.role.isNotEmpty ? user.role : 'No role',
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
+                    _buildListTile(
+                      icon: Icons.person,
+                      title: 'Home page',
+                      onTap: () => _navigateTo(context, '/account'),
+                    ),
+                    _buildListTile(
+                      icon: Icons.person_pin_outlined,
+                      title: 'Edit profile',
+                      onTap: () => _navigateTo(context, '/profile_edit'),
+                    ),
+                    _buildListTile(
+                      icon: Icons.label,
+                      title: 'Lessons',
+                      onTap: () => _navigateTo(context, '/user_lesson'),
+                    ),
+                    if (user.role == 'TEACHER') ...[
+                      _buildListTile(
+                        icon: Icons.school,
+                        title: 'Ученики',
+                        onTap: () => _navigateTo(context, '/students'),
+                      ),
+                      _buildListTile(
+                        icon: Icons.book,
+                        title: 'Уроки',
+                        onTap: () => _navigateTo(context, '/lessons'),
+                      ),
+                    ],
                   ],
                 ),
               ),
-              // _buildListTile(
-              //   icon: Icons.home,
-              //   title: 'Home',
-              //   onTap: () => _navigateTo(context, '/'),
-              // ),
-              _buildListTile(
-                icon: Icons.person,
-                title: 'Home page',
-                onTap: () => _navigateTo(context, '/account'),
-              ),
-              _buildListTile(
-                icon: Icons.person_pin_outlined,
-                title: 'Edit profile',
-                onTap: () => _navigateTo(context, '/profile'),
-              ),
-              _buildListTile(
-                icon: Icons.label,
-                title: 'Lessons',
-                onTap: () => _navigateTo(context, '/user-lesson'),
-              ),
-              if (user.role == 'TEACHER') ...[
-                _buildListTile(
-                  icon: Icons.school,
-                  title: 'Ученики',
-                  onTap: () => _navigateTo(context, '/students'),
-                ),
-                _buildListTile(
-                  icon: Icons.book,
-                  title: 'Уроки',
-                  onTap: () => _navigateTo(context, '/lessons'),
-                ),
-              ],
               _buildListTile(
                 icon: Icons.logout,
                 title: 'Logout',
