@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../dataclasses/user.dart';
 import '../../errors/jwt_errors.dart';
 import '../../widgets/side_menu.dart';
-import '../forms/user_forms.dart';
+import '../../widgets/user_forms.dart';
 
 class EditProfileScreen extends StatefulWidget {
   @override

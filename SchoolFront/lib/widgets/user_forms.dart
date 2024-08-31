@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../dataclasses/user.dart';
-import '../../errors/user_errors.dart';
+import '../dataclasses/user.dart';
+import '../errors/user_errors.dart';
 
 class UserForms{
   final _firstNameController = TextEditingController();

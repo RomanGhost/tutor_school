@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:school/screens/user_lesson/subject_card.dart';
+import 'package:school/screens/user_lesson/widgets/subject_card.dart';
 import 'package:school/widgets/side_menu.dart'; // Импорт виджета бокового меню
 
 import '../../api/subject_api.dart';

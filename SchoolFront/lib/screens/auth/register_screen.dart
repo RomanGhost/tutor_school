@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/auth_api.dart';
 import '../../dataclasses/user.dart';
-import '../forms/user_forms.dart';
+import '../../widgets/user_forms.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override

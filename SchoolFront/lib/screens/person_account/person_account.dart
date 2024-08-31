@@ -6,7 +6,7 @@ import 'package:school/widgets/side_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../dataclasses/user.dart';
-import '../../widgets/next_lesson_widget.dart';
+import 'widgets/next_lesson_widget.dart';
 
 
 class UserProfileScreen extends StatefulWidget {

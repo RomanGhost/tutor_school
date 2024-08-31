@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:school/api/lesson_api.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../dataclasses/lesson.dart';
+import '../../../dataclasses/lesson.dart';
 import 'booking_and_detail_widget.dart';
 
 class LessonCalendarWidget extends StatefulWidget {

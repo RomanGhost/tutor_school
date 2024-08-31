@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../api/lesson_api.dart';
-import '../dataclasses/lesson.dart';
+import '../../../api/lesson_api.dart';
+import '../../../dataclasses/lesson.dart';
 import 'Calendar.dart';
 
 class NextLessonWidget extends StatefulWidget {

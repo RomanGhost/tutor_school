@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/auth_api.dart';
 import '../../dataclasses/user.dart';
-import '../forms/user_forms.dart';
+import '../../widgets/user_forms.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -21,6 +22,21 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    _initialize();
+  }
+
+  void _initialize() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jwt = prefs.getString('jwt');
+
+    if (jwt != null) {
+      _navigateToUserProfile();
+    }
   }
 
   Future<void> _login() async {
