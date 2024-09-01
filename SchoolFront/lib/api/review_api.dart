@@ -4,10 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:school/api/api_interface.dart';
 import 'package:school/dataclasses/review.dart';
 
+import '../dataclasses/config.dart';
 import '../service/jwt_work.dart';
 
 class ReviewApi extends Api{
-  final String _baseUrl = 'http://localhost:8080/api/review';
+  final String _baseUrl = '${Config.baseUrl}/api/review';
 
   Future<List<Review>> getAllReview() async{
     final url = Uri.parse('$_baseUrl/get_all');

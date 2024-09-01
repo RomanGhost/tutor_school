@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:school/dataclasses/student.dart';
 
+import '../dataclasses/config.dart';
 import '../service/jwt_work.dart';
 import 'api_interface.dart';
 
 class StudentApi extends Api {
-  final String _baseUrl = 'http://localhost:8080/api/student/teacher';
+  final String _baseUrl = '${Config.baseUrl}/api/student/teacher';
 
   Future<List<Student>> getStudents() async {
     final jwt = await JwtWork().getJwt();

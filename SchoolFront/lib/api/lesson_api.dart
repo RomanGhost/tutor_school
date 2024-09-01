@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:school/dataclasses/teacher_lesson.dart';
+import '../dataclasses/config.dart';
 import '../dataclasses/lesson.dart';
 import '../service/jwt_work.dart';
 import 'api_interface.dart';
 
 class LessonApi extends Api {
-  final String _baseUrl = 'http://localhost:8080/api/lesson'; // Замените на ваш IP
+  final String _baseUrl = '${Config.baseUrl}/api/lesson'; // Замените на ваш IP
 
   Future<bool> deleteLesson(int lessonId) async {
     final jwt = await JwtWork().getJwt();

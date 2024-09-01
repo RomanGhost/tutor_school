@@ -4,11 +4,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:school/service/jwt_work.dart';
 
+import '../dataclasses/config.dart';
 import '../dataclasses/user.dart';
 import 'api_interface.dart';
 
 class AuthApi extends Api{
-  final String _baseUrl = 'http://localhost:8080/api/auth'; // Замените на ваш IP
+  final String _baseUrl = '${Config.baseUrl}/api/auth'; // Замените на ваш IP
   String? _jwt;
 
   Future<String?> authenticateUser(User user) async {

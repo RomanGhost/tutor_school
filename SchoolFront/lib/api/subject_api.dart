@@ -2,12 +2,13 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../dataclasses/config.dart';
 import '../dataclasses/subject.dart';
 import '../service/jwt_work.dart';
 import 'api_interface.dart';
 
 class SubjectApi extends Api{
-  final String _baseUrl = 'http://localhost:8080/api';
+  final String _baseUrl = '${Config.baseUrl}/api';
 
   Future<List<Subject>> getAvailableSubjects() async{
     final jwt = await JwtWork().getJwt();
