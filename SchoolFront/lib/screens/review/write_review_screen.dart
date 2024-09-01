@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/review_api.dart';
 import '../../dataclasses/review.dart';
@@ -12,10 +14,31 @@ class WriteReviewScreen extends StatefulWidget {
 
 class _WriteReviewScreenState extends State<WriteReviewScreen> {
   int _rating = 0; // Initial rating set to 0
-  bool _showUserData=true;
+  bool _showUserData = true;
+  bool _isAdmin = false; // Flag to check if user is admin
   final TextEditingController _reviewController = TextEditingController();
+  final TextEditingController _sourceController = TextEditingController(); // Controller for source
   final ReviewApi _reviewApi = ReviewApi();
-  // Review _review = Review.undefined();
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  void _initialize() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jwt = prefs.getString('jwt');
+    if (jwt == null || JwtDecoder.isExpired(jwt)) {
+      print("JWT not found or expired");
+    } else {
+      final decodedToken = JwtDecoder.decode(jwt);
+      final role = decodedToken['role']['authority'] as String;
+      setState(() {
+        _isAdmin = role == "ADMIN"; // Check if the role is ADMIN
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +78,10 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
           _buildStarRating(),
           const SizedBox(height: 20),
           _buildReviewTextField(),
+          if (_isAdmin) ...[
+            const SizedBox(height: 20),
+            _buildSourceTextField(), // Show source field if admin
+          ],
           const SizedBox(height: 20),
           _buildDataShowButton(),
           const SizedBox(height: 20),
@@ -80,26 +107,25 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(5, (index) {
         return GestureDetector(
-            onTap: () {
-              setState(() {
-                _rating = index + 1; // Set rating based on tapped star
-              });
-            },
-            child: Stack(
-                children: [
-                  Icon(
-                    Icons.star,
-                    color: index < _rating ? _getStarColor(_rating) : Colors
-                        .grey, // Uniform color based on rating
-                    size: 30, // Size of the stars
-                  ),
-                  const Icon(
-                    Icons.star_border,
-                    color: Colors.black,
-                    size: 30,
-                  )
-                ]
-            )
+          onTap: () {
+            setState(() {
+              _rating = index + 1; // Set rating based on tapped star
+            });
+          },
+          child: Stack(
+            children: [
+              Icon(
+                Icons.star,
+                color: index < _rating ? _getStarColor(_rating) : Colors.grey,
+                size: 30,
+              ),
+              const Icon(
+                Icons.star_border,
+                color: Colors.black,
+                size: 30,
+              ),
+            ],
+          ),
         );
       }),
     );
@@ -135,6 +161,19 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
     );
   }
 
+  Widget _buildSourceTextField() {
+    return TextFormField(
+      controller: _sourceController,
+      decoration: InputDecoration(
+        labelText: 'Источник (опционально)',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        hintText: 'Введите источник...',
+      ),
+    );
+  }
+
   Widget _buildSubmitButton() {
     return ElevatedButton(
       onPressed: _submitReview,
@@ -156,7 +195,8 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
   }
 
   void _submitReview() async {
-    final String review = _reviewController.text;
+    final review = _reviewController.text;
+    final source = _isAdmin ? _sourceController.text : ''; // Include source if admin
 
     // Валидация: проверяем, что введен текст и выбран хотя бы одна звезда
     if (review.isEmpty || _rating == 0) {
@@ -175,7 +215,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
     Review newReview = Review(
       rate: _rating,
       text: review,
-      source: '',
+      source: source,
       showUserData: _showUserData,
     );
 
@@ -184,6 +224,7 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
 
     // После отправки очищаем форму и сбрасываем рейтинг
     _reviewController.clear();
+    _sourceController.clear();
     setState(() {
       _rating = 0;
     });
@@ -198,23 +239,25 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
 
   Widget _buildDataShowButton() {
     return Row(
-        children: [
-          Checkbox(
-            value: _showUserData, onChanged: (bool? value) {
+      children: [
+        Checkbox(
+          value: _showUserData,
+          onChanged: (bool? value) {
             setState(() {
               _showUserData = value ?? false;
             });
-          },),
-          const SizedBox(width: 10),
-          Text(
-            "Показывать данные в отзыве",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue.shade800,
-            ),
+          },
+        ),
+        const SizedBox(width: 10),
+        Text(
+          "Показывать данные в отзыве",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.blue.shade800,
           ),
-        ]
+        ),
+      ],
     );
   }
 }

@@ -109,25 +109,25 @@ Widget buildDiscountText() {
     TextSpan(
       children: [
         TextSpan(
-            text: 'Первый урок со скидкой ', style: TextStyle(fontSize: 16)),
+          text: '• Познакомимся и создадим комфортную атмосферу для обучения;\n',
+          style: TextStyle(fontSize: 16, color: Colors.black87),
+        ),
         TextSpan(
-            text: '40% ',
-            style: TextStyle(fontSize: 22, color: Colors.redAccent)),
+          text: '• Оценим ваш текущий уровень знаний и выявим слабые стороны;\n',
+          style: TextStyle(fontSize: 16, color: Colors.black87),
+        ),
         TextSpan(
-            text: " 300 руб.",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          text: '• Составим индивидуальный план занятий, ориентированный на ваши цели и потребности;\n',
+          style: TextStyle(fontSize: 16, color: Colors.black87),
+        ),
         TextSpan(
-          text: "500 руб.",
-          style: TextStyle(
-            fontSize: 16,
-            decoration: TextDecoration.lineThrough,
-            decorationColor: Colors.red,
-            decorationThickness: 2,
-          ),
+          text: '• Обсудим желаемые результаты и сроки их достижения.',
+          style: TextStyle(fontSize: 16, color: Colors.black87),
         ),
       ],
     ),
   );
+
 }
 
 // Виджет для отображения текста
@@ -235,8 +235,6 @@ Widget buildReviewSection(BuildContext context, List<Review> reviews) {
   );
 }
 
-
-
 Widget _buildReview({
   required Review review,
 }) {
@@ -261,6 +259,25 @@ Widget _buildReview({
         review.text,
         style: const TextStyle(fontSize: 16),
       ),
+      if (review.source.isNotEmpty)
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: () => launchURL(review.source),
+              child: const Text(
+                'Источник',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ],
+        ),
     ],
   );
 }
+

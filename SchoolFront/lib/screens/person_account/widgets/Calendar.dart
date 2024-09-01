@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:school/api/lesson_api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../dataclasses/lesson.dart';
@@ -24,8 +26,25 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
 
   /// Инициализация уроков для выбранного месяца.
   void _initializeLessonsForMonth(DateTime date) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jwt = prefs.getString('jwt');
+    String role = "USER";
+    if(jwt == null || JwtDecoder.isExpired(jwt)){
+      print("jwt not found");
+    }
+    else {
+      final decodedToken = JwtDecoder.decode(jwt);
+      final email = decodedToken['sub'] as String?;
+      role = decodedToken['role']['authority'] as String;
+    }
     try {
-      final lessons = await _lessonApi.getLessonsForMonth(date.year, date.month); // Запрос уроков за месяц
+      final lessons;
+      if(role == "TEACHER"){
+        lessons = await _lessonApi.getTeacherLessonsForMonth( date.year, date.month);
+      }else {
+        lessons = await _lessonApi.getLessonsForMonth(
+            date.year, date.month); // Запрос уроков за месяц
+      }
       _lessonsNotifier.value = _groupLessonsByDate(lessons);
     } catch (e) {
       print('Failed to initialize lessons for month: $e');

@@ -241,7 +241,6 @@ class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
     try {
       final addedLesson = await _lessonApi.addLessons(newLesson);
       if (addedLesson != null) {
-        print(addedLesson.id);
         widget.onSave(addedLesson);
         _resetForm();
       } else {
@@ -261,7 +260,7 @@ class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'Проведен':
+      case 'Подтвержден':
         return Colors.green;
       case 'Отменен':
         return Colors.red;

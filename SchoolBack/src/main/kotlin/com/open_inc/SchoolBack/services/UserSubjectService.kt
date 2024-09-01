@@ -50,4 +50,8 @@ class UserSubjectService(
     fun getUserSubjectById(id: Int): UserSubject? {
         return userSubjectRepository.getReferenceById(id)
     }
+
+    fun getAllUserSubject():List<UserSubject>{
+        return userSubjectRepository.findAll()
+    }
 }

@@ -64,7 +64,7 @@ class _NextLessonWidgetState extends State<NextLessonWidget> {
   Text _buildNextLesson(Lesson? lesson){
     String lessonText = "Следующий урок не найдет. Стоит записаться!";
     if (lesson != null) {
-      lessonText = lesson.toString();
+      lessonText = "${lesson.toString()} ${lesson.time.day}.${lesson.time.month}.${lesson.time.year}";
     }
     return _buildText(lessonText, 20, Colors.white, FontWeight.w200);
   }

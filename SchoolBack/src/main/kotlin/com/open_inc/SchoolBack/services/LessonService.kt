@@ -21,6 +21,14 @@ class LessonService(
         return lessonRepository.findLessonByEmail(email).filter{it.isVisible}
     }
 
+    fun getLessonTeacherAfterDate(date: OffsetDateTime): List<Lesson> {
+        return lessonRepository.findLessonsAfterDate(date)
+    }
+
+    fun getAllLessonsByMonth(year:Int, month:Int): List<Lesson> {
+        return lessonRepository.findAll().filter { (it.plainDateTime.year==year) && (it.plainDateTime.month.value==month) && it.isVisible }
+    }
+
     fun getLessonById(id:Int): Lesson? {
         return lessonRepository.getReferenceById(id)
     }

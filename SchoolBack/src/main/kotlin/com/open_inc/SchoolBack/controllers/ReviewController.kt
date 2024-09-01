@@ -17,7 +17,7 @@ class ReviewController(
     private val jwtUtil: JWTUtil,
     private val userService: UserService,
     ) {
-    @GetMapping("/getall")
+    @GetMapping("/get_all")
     fun getAllReview(): ResponseEntity<List<ReviewDataGet>> {
         val reviews =  reviewService.getAllReview()
         val result:MutableList<ReviewDataGet> = mutableListOf()

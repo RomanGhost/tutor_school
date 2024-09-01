@@ -22,10 +22,10 @@ data class Lesson(
 
     @ManyToOne
     @JoinColumn(name = "status", nullable = false)
-    val status: Status,
+    var status: Status,
 
     @Column(name = "plain_datetime")
-    val plainDateTime: OffsetDateTime? = null,
+    val plainDateTime: OffsetDateTime = OffsetDateTime.now(),
 
     @Column(name = "created_at", nullable = false)
     val createdAt: OffsetDateTime = OffsetDateTime.now(),

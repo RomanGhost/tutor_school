@@ -89,14 +89,14 @@ class User {
   }
 
 // Password validation can be added back here if needed
-// static String _validatePassword(String password) {
-//   final passwordPattern = r'^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,}$';
-//   final passwordRegex = RegExp(passwordPattern);
+static String _validatePassword(String password) {
+  final passwordPattern = r'^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,}$';
+  final passwordRegex = RegExp(passwordPattern);
 
-//   if (!passwordRegex.hasMatch(password)) {
-//     throw PasswordError("Password isn't correct");
-//   }
+  if (!passwordRegex.hasMatch(password)) {
+    throw PasswordError("Password isn't correct");
+  }
 
-//   return password;
-// }
+  return password;
+}
 }

@@ -18,7 +18,7 @@ class SubjectController(
     private val userSubjectService: UserSubjectService,
 ) {
 
-    @GetMapping("/getall")
+    @GetMapping("/get_all")
     fun getAll() : ResponseEntity<MutableList<SubjectData>> {
         val subjects = subjectService.getAllSubjects()
         val returnSubjects = mutableListOf<SubjectData>()

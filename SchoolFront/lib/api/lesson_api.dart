@@ -1,7 +1,6 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
-
+import 'package:school/dataclasses/teacher_lesson.dart';
 import '../dataclasses/lesson.dart';
 import '../service/jwt_work.dart';
 import 'api_interface.dart';
@@ -55,9 +54,8 @@ class LessonApi extends Api {
       );
       if (response.statusCode == 200) {
         final result = json.decode(response.body) as List<dynamic>;
-        // print(result);
         List<Lesson> resultLessons = List.empty(growable: true);
-        //
+
         for (var lessonJson in result) {
           Lesson newLesson = Lesson(
               id: lessonJson['id'],
@@ -97,13 +95,11 @@ class LessonApi extends Api {
         List<Lesson> resultLessons = List.empty(growable: true);
 
         for (var lessonJson in result) {
-          // Преобразуем время в UTC и затем в локальное время
           DateTime utcTime = DateTime.parse(lessonJson['plainDateTime']).toUtc();
-
           Lesson newLesson = Lesson(
               id: lessonJson['id'],
               title: lessonJson['subject'],
-              time: utcTime, // Сохраняем в локальном времени
+              time: utcTime,
               status: lessonJson['status']);
           resultLessons.add(newLesson);
         }
@@ -135,17 +131,13 @@ class LessonApi extends Api {
       );
       if (response.statusCode == 200) {
         final lessonJson = json.decode(response.body) as Map<String, dynamic>;
-
-        // Преобразуем время в UTC и затем в локальное время
         DateTime utcTime = DateTime.parse(lessonJson['plainDateTime']).toUtc();
-
         Lesson nextLesson = Lesson(
           id: lessonJson['id'],
           title: lessonJson['subject'],
-          time: utcTime, // Сохраняем в локальном времени
+          time: utcTime,
           status: lessonJson['status'],
         );
-
         return nextLesson;
       } else {
         logError('Failed to get next lesson', response);
@@ -179,14 +171,11 @@ class LessonApi extends Api {
       );
       if (response.statusCode == 200) {
         final lessonJson = json.decode(response.body) as Map<String, dynamic>;
-
-        // Преобразуем время в UTC и затем в локальное время
         DateTime utcTime = DateTime.parse(lessonJson['plainDateTime']).toUtc();
-
         Lesson newLesson = Lesson(
           id: lessonJson['id'],
           title: lessonJson['subject'],
-          time: utcTime, // Сохраняем в локальном времени
+          time: utcTime,
           status: lessonJson['status'],
         );
         return newLesson;
@@ -198,4 +187,133 @@ class LessonApi extends Api {
     }
     return null;
   }
+
+  Future<List<TeacherLesson>> getProposedLessonsForTeacher() async {
+    final jwt = await JwtWork().getJwt();
+    if (jwt == null) {
+      print('No JWT found, user may not be authenticated.');
+      return List<TeacherLesson>.empty();
+    }
+
+    final url = Uri.parse('$_baseUrl/teacher/get');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwt',
+        },
+      );
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body) as List<dynamic>;
+        List<TeacherLesson> proposedLessons = List.empty(growable: true);
+
+        for (var lessonTeacherJson in result) {
+          var lessonJson = lessonTeacherJson["lessonData"];
+          DateTime utcTime = DateTime.parse(lessonJson['plainDateTime']).toUtc();
+          Lesson lesson = Lesson(
+            id: lessonJson['id'],
+            title: lessonJson['subject'],
+            time: utcTime,
+            status: lessonJson['status'],
+          );
+          TeacherLesson teacherLesson = TeacherLesson(
+              lesson: lesson,
+              firstName: lessonTeacherJson['firstName'],
+              lastName: lessonTeacherJson['lastName']
+          );
+          proposedLessons.add(teacherLesson);
+        }
+        return proposedLessons;
+      } else {
+        logError('Failed to get proposed lessons', response);
+      }
+    } catch (e) {
+      print('Error occurred while fetching proposed lessons: $e');
+    }
+    return List<TeacherLesson>.empty();
+  }
+
+  Future<TeacherLesson?> approveLesson(int lessonId) async {
+    final jwt = await JwtWork().getJwt();
+    if (jwt == null) {
+      print('No JWT found, user may not be authenticated.');
+      return null;
+    }
+
+    final url = Uri.parse('$_baseUrl/teacher/approve?lessonId=$lessonId');
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwt',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body) as Map<String, dynamic>;
+
+        var lessonJson = result["lessonData"] as Map<String, dynamic>;
+        DateTime utcTime = DateTime.parse(lessonJson['plainDateTime']).toUtc();
+        Lesson lesson = Lesson(
+          id: lessonJson['id'],
+          title: lessonJson['subject'],
+          time: utcTime,
+          status: lessonJson['status'],
+        );
+        TeacherLesson teacherLesson = TeacherLesson(
+            lesson: lesson,
+            firstName: result['firstName'],
+            lastName: result['lastName']
+        );
+
+        return teacherLesson;
+      } else {
+        logError('Failed to approve lesson', response);
+      }
+    } catch (e) {
+      print('Error occurred while approving lesson: $e');
+    }
+    return null;
+  }
+
+  Future<List<Lesson>> getTeacherLessonsForMonth(int year, int month) async {
+    final jwt = await JwtWork().getJwt();
+    if (jwt == null) {
+      print('No JWT found, user may not be authenticated.');
+      return List<Lesson>.empty();
+    }
+
+    final url = Uri.parse('$_baseUrl/teacher/get_all_lessons_by_month?year=$year&month=$month');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwt',
+        },
+      );
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body) as List<dynamic>;
+        List<Lesson> resultLessons = List.empty(growable: true);
+
+        for (var lessonJson in result) {
+          Lesson newLesson = Lesson(
+              id: lessonJson['id'],
+              title: lessonJson['subject'],
+              time: DateTime.parse(lessonJson['plainDateTime']),
+              status: lessonJson['status']);
+          resultLessons.add(newLesson);
+        }
+        return resultLessons;
+      } else {
+        logError('Failed to get lesson', response);
+      }
+    } catch (e) {
+      print('Error occurred while fetching lesson: $e');
+    }
+    return List<Lesson>.empty();
+  }
+
 }

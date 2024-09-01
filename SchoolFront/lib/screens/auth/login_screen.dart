@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/auth_api.dart';
 import '../../dataclasses/user.dart';
+import '../../errors/user_errors.dart';
 import '../../widgets/user_forms.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -40,10 +41,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-
-    final user = userForms.getUserLogin();
-    print("${user.email} ${user.password}");
-
+    final user;
+    try {
+      user = userForms.getUserLogin();
+    }on PasswordError{
+      _showErrorSnackbar('Слишком легкий пароль');
+      return;
+    }
     try {
       final jwt = await _apiService.authenticateUser(user);
 
@@ -140,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
       onPressed: () {
         Navigator.pushNamed(context, '/signup');
       },
-      child: Text('Зарегестрироваться'),
+      child: const Text('Зарегистрироваться'),
     );
   }
 }

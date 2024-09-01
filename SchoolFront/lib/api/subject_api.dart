@@ -98,7 +98,6 @@ class SubjectApi extends Api{
         final result = json.decode(response.body) as List<dynamic>;
         List<Subject> resultSubject = List.empty(growable: true);
         for (var subjectJson in result){
-          print(subjectJson);
           Subject newSubject = Subject(
             id: subjectJson['id'],
             name: subjectJson['name'],

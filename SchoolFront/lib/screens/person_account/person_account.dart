@@ -24,11 +24,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     try {
       _loadUserData();
     }on JwtIsNull catch(e){
-      print(e);
-      if (Navigator.canPop(context))
+      if (Navigator.canPop(context)) {
         Navigator.pop(context);
-      else
+      } else {
         Navigator.pushNamed(context, '/login');
+      }
     }
   }
 
@@ -39,7 +39,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       throw JwtIsNull("Token is not valid");
     }
     Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
-    print(decodedToken);
     String? email = decodedToken['sub'];
 
     final user = await _apiService.getUser(email!);
@@ -52,19 +51,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Главная'),
+        title: const Text('Главная'),
       ),
-      drawer: SideMenu(), // Добавление боковой панели
+      drawer: const SideMenu(), // Добавление боковой панели
       body: _userData == null
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             NextLessonWidget(),
-            SizedBox(height: 20),
-            Expanded(
+            const SizedBox(height: 20),
+            const Expanded(
               child: Center(
                 child: Text(
                   'Welcome to your dashboard!',

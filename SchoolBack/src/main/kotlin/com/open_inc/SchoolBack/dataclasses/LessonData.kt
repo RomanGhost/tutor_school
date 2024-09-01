@@ -6,5 +6,11 @@ data class LessonData(
     val id:Int,
     val subject:String,
     val plainDateTime: OffsetDateTime,
-    val status:String,
+    val status:String
+)
+
+data class TeacherLessonData(
+    val lessonData: LessonData,
+    val firstName:String,
+    val lastName:String,
 )

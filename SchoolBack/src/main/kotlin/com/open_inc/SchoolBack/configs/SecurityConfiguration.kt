@@ -24,7 +24,9 @@ class SecurityConfiguration(
     fun securityFilterChain(http: HttpSecurity) : SecurityFilterChain {
         return http.csrf{it.disable()}
             .authorizeHttpRequests {
-                it.requestMatchers("/api/auth/**", "/api/review/getall").permitAll()
+                it.requestMatchers("/api/auth/**", "/api/review/get_all").permitAll()
+                //TODO Сделать нормкльную авторизацию по Роли, а не как сейчас внутри функции
+//                it.requestMatchers("/api/lesson/teacher/**", "/api/student/teacher/**")
                 it.anyRequest().authenticated()
             }
             .sessionManagement {

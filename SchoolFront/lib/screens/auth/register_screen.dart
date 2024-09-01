@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/auth_api.dart';
 import '../../dataclasses/user.dart';
+import '../../errors/user_errors.dart';
 import '../../widgets/user_forms.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -20,7 +21,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     Future<void> _submit() async {
       if (_formKey.currentState?.validate() ?? false) {
         _formKey.currentState?.save();
-        User newUser = userForms.getUser(checkPassword: true);
+
+        final newUser;
+        try {
+          newUser = userForms.getUser(checkPassword: true);
+        }on PasswordError{
+          _showErrorSnackbar('Слишком легкий пароль');
+          return;
+        }
         try {
           String? jwt = await _apiService.registerUser(newUser);
           if (jwt != null) {
@@ -99,6 +107,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 }

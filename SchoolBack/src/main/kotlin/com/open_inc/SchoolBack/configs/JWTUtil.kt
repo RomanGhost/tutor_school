@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.Date
 import javax.crypto.SecretKey
+import kotlin.reflect.typeOf
 
 @Service
 class JWTUtil {
@@ -44,6 +45,12 @@ class JWTUtil {
     fun getUsernameFromToken(token: String): String {
         return getClaimFromToken(token, Claims::getSubject)
     }
+
+    fun getRoleUser(token:String): String {
+        val roleMap = getAllClaimsFromToken(token)["role"] as Map<String, String>
+        return roleMap["authority"]?:"USER"
+    }
+
 
     fun <T> getClaimFromToken(token: String, claimsResolver: (Claims) -> T): T {
         val claims = getAllClaimsFromToken(token)

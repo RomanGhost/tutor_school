@@ -115,7 +115,7 @@ class _SideMenuState extends State<SideMenu> {
                   _buildListTile(
                     icon: Icons.book,
                     title: 'Уроки',
-                    onTap: () => _navigateTo(context, '/lessons'),
+                    onTap: () => _navigateTo(context, '/teacher_lesson'),
                   ),
                 ],
               ],

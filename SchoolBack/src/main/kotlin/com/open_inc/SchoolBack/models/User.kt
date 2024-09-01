@@ -11,13 +11,13 @@ data class User(
     val id: Int = 0,
 
     @Column(name = "last_name", length = 128)
-    val lastName: String? = null,
+    val lastName: String = "",
 
     @Column(name = "first_name", length = 128)
-    val firstName: String? = null,
+    val firstName: String = "",
 
     @Column(name = "surname", length = 128)
-    val surname: String? = null,
+    val surname: String = "",
 
     @Column(name = "email", length = 256, unique = true, nullable = false)
     val email: String,

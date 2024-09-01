@@ -1,7 +1,7 @@
 class Review{
   final int rate;
   final String text;
-  final String? source;
+  String source="";
   String userData="Аноним";
   bool showUserData;
 

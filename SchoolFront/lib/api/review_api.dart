@@ -10,7 +10,7 @@ class ReviewApi extends Api{
   final String _baseUrl = 'http://localhost:8080/api/review';
 
   Future<List<Review>> getAllReview() async{
-    final url = Uri.parse('$_baseUrl/getall');
+    final url = Uri.parse('$_baseUrl/get_all');
     try {
       final response = await http.get(
         url,
