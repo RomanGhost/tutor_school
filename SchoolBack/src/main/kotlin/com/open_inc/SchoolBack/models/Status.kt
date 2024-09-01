@@ -9,6 +9,6 @@ data class Status(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
-    @Column(name = "name", length = 16)
+    @Column(name = "name", length = 16, unique = true)
     val name: String? = null
 )

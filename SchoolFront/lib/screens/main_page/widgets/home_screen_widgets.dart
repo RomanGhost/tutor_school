@@ -14,8 +14,8 @@ Widget buildInfoCard() {
         const SizedBox(height: 10),
         buildBodyText(
           'Меня зовут Ольга, и я — Ваш личный репетитор по английскому и немецкому языкам. '
-              'Готовы открыть новые горизонты? Вместе мы достигнем ваших языковых целей. '
-              'Я помогу вам сделать учебу увлекательной и продуктивной. Присоединяйтесь ко мне в этом языковом путешествии!',
+          'Готовы открыть новые горизонты? Вместе мы достигнем ваших языковых целей. '
+          'Я помогу вам сделать учебу увлекательной и продуктивной. Присоединяйтесь ко мне в этом языковом путешествии!',
         ),
         const SizedBox(height: 20),
         buildHeaderText('Мои услуги:'),
@@ -28,9 +28,9 @@ Widget buildInfoCard() {
         const SizedBox(height: 10),
         buildBodyText(
           '- Индивидуальный подход к каждому ученику\n'
-              '- Опыт и квалификация\n'
-              '- Доступность и гибкость\n'
-              '- Дружелюбная атмосфера на занятиях',
+          '- Опыт и квалификация\n'
+          '- Доступность и гибкость\n'
+          '- Дружелюбная атмосфера на занятиях',
         ),
         const SizedBox(height: 20),
         buildHeaderText('Контакты:'),
@@ -46,7 +46,8 @@ Widget buildInfoCard() {
 }
 
 // Виджет для профиля и отзывов
-Widget buildProfileAndReviews(BuildContext context, String profileImageUrl, List<Review> reviews) {
+Widget buildProfileAndReviews(
+    BuildContext context, String profileImageUrl, List<Review> reviews) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
@@ -63,12 +64,28 @@ Widget buildProfileAndReviews(BuildContext context, String profileImageUrl, List
 Widget buildProfileImage(String url) {
   return ClipRRect(
     borderRadius: BorderRadius.circular(15),
-    child: Image.network(
-      url,
-      fit: BoxFit.cover,
+    child: Container(
+      height: 400.0,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned(
+            top: 0, // Начало отображения с верхней части
+            bottom: null, // Не ограничиваем отображение по нижнему краю
+            left: 0,
+            right: 0,
+            child: Image.network(
+              url,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }
+
+
 
 // Виджет для блока записи на урок
 Widget buildPracticingBlock(BuildContext context) {
@@ -109,15 +126,18 @@ Widget buildDiscountText() {
     TextSpan(
       children: [
         TextSpan(
-          text: '• Познакомимся и создадим комфортную атмосферу для обучения;\n',
+          text:
+              '• Познакомимся и создадим комфортную атмосферу для обучения;\n',
           style: TextStyle(fontSize: 16, color: Colors.black87),
         ),
         TextSpan(
-          text: '• Оценим ваш текущий уровень знаний и выявим слабые стороны;\n',
+          text:
+              '• Оценим ваш текущий уровень знаний и выявим слабые стороны;\n',
           style: TextStyle(fontSize: 16, color: Colors.black87),
         ),
         TextSpan(
-          text: '• Составим индивидуальный план занятий, ориентированный на ваши цели и потребности;\n',
+          text:
+              '• Составим индивидуальный план занятий, ориентированный на ваши цели и потребности;\n',
           style: TextStyle(fontSize: 16, color: Colors.black87),
         ),
         TextSpan(
@@ -127,7 +147,6 @@ Widget buildDiscountText() {
       ],
     ),
   );
-
 }
 
 // Виджет для отображения текста
@@ -211,7 +230,8 @@ Widget buildReviewSection(BuildContext context, List<Review> reviews) {
           children: [
             buildHeaderText('Отзывы:'),
             IconButton(
-              onPressed: () => Navigator.pushNamed(context, '/login', arguments: '/write_review'),
+              onPressed: () => Navigator.pushNamed(context, '/login',
+                  arguments: '/write_review'),
               icon: Icon(Icons.add, color: Colors.blue.shade800),
             ),
           ],
@@ -223,7 +243,8 @@ Widget buildReviewSection(BuildContext context, List<Review> reviews) {
             child: Column(
               children: reviews.map((review) {
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 15), // Промежуток между отзывами
+                  padding: const EdgeInsets.only(bottom: 15),
+                  // Промежуток между отзывами
                   child: _buildReview(review: review),
                 );
               }).toList(),
@@ -280,4 +301,3 @@ Widget _buildReview({
     ],
   );
 }
-

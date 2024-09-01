@@ -14,7 +14,7 @@ data class Subject(
     val name: String,
 
     @Column(name = "price", precision = 2)
-    val price: Float? = null,
+    val price: Float = 0f,
 
     @Column(name = "created_at", nullable = false)
     val createdAt: OffsetDateTime = OffsetDateTime.now(),

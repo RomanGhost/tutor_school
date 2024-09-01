@@ -14,10 +14,10 @@ data class Level(
     val name: String,
 
     @Column(name = "description", length = 256)
-    val description: String? = null,
+    val description: String = "",
 
     @Column(name = "coefficient")
-    val coefficient: Float? = null,
+    val coefficient: Float = 1f,
 
     @Column(name = "created_at", nullable = false)
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
