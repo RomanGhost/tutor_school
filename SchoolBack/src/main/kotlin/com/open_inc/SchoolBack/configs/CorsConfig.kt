@@ -7,7 +7,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 class CorsConfig : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
-            .allowedOrigins("http://localhost:8000")
+            .allowedOrigins("http://localhost:8000",       // Для локальной разработки
+                "http://localhost",           // Фронтенд в Docker-контейнере
+                "http://frontend",            // Внутреннее имя контейнера для фронтенда
+                "http://frontend:80")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("Content-Type", "Authorization")
             .allowCredentials(true)
