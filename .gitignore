@@ -13,6 +13,7 @@ migrate_working_dir/
 .gradle/
 build/
 
+.env
 # IntelliJ related
 *.iml
 *.ipr
