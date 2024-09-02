@@ -5,19 +5,25 @@ services:
     build:
       context: ./SchoolBack
       dockerfile: Dockerfile
-    container_name: school-backend  # Задаем имя контейнера
+    container_name: school-backend
     ports:
       - "8090:8080"
     depends_on:
       - db
+    environment:
+      - MY_SPRING_DATASOURCE_USER=${MY_SPRING_DATASOURCE_USER}
+      - MY_SPRING_DATASOURCE_PASSWORD=${MY_SPRING_DATASOURCE_PASSWORD}
+      - MY_SPRING_DATASOURCE_DB=${MY_SPRING_DATASOURCE_DB}
+      - MY_SPRING_DATASOURCE_URL=${MY_SPRING_DATASOURCE_URL}  # используем имя сервиса базы данных
+      - MY_SPRING_DATASOURCE_PORT=${MY_SPRING_DATASOURCE_PORT}
 
   frontend:
     build:
       context: ./SchoolFront
       dockerfile: Dockerfile
-    container_name: school-frontend  # Задаем имя контейнера
+    container_name: school-frontend
     environment:
-      - BASE_URL=http://backend:8090  # URL для подключения к бэкенду
+      - BASE_URL=http://backend:8090
     ports:
       - "80:80"
     depends_on:
@@ -31,15 +37,15 @@ services:
 
   db:
     image: postgres:13
-    container_name: school-db  # Задаем имя контейнера
+    container_name: school-db
     environment:
-      - POSTGRES_DB=${MY_SPRING_DATASOURCE_DB}
-      - POSTGRES_USER=${MY_SPRING_DATASOURCE_USER}
-      - POSTGRES_PASSWORD=${MY_SPRING_DATASOURCE_PASSWORD}
+      - POSTGRES_DB=school_tutor
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=hdfjhgdsghdkgls
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "${MY_SPRING_DATASOURCE_PORT}:5432"
+      - "5432:5432"
 
 volumes:
   postgres_data:
