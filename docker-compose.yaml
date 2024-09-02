@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./SchoolBack  # Путь к директории с Dockerfile для бэкенда
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=db
+      - SPRING_DATASOURCE_DB=your_database_name
+      - SPRING_DATASOURCE_USER=${MY_SPRING_DATASOURCE_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MY_SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "8090:8080"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./SchoolFront  # Путь к директории с Dockerfile для фронтенда
+      dockerfile: Dockerfile
+    environment:
+      - BASE_URL=http://backend:8090  # URL для подключения к бэкенду
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=${MY_SPRING_DATASOURCE_DB}
+      - POSTGRES_USER=${MY_SPRING_DATASOURCE_USER}
+      - POSTGRES_PASSWORD=${MY_SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${MY_SPRING_DATASOURCE_USER}"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+volumes:
+  postgres_data:
