@@ -4,9 +4,9 @@ FROM dart:stable AS build
 # Install specific Flutter SDK version (between 3.4.2 and 4.0.0)
 RUN git clone https://github.com/flutter/flutter.git /flutter \
     && cd /flutter \
-    && git checkout 3.10.0 # Замените на нужную версию между 3.4.2 и 4.0.0
+    && git checkout 3.10.0 # Replace with the desired version between 3.4.2 and 4.0.0
 
-# Set the flutter path
+# Set the Flutter path
 ENV PATH="/flutter/bin:/flutter/bin/cache/dart-sdk/bin:${PATH}"
 
 # Pre-download Flutter dependencies
@@ -24,8 +24,8 @@ COPY . .
 # Install dependencies
 RUN flutter pub get
 
-# Build the flutter web application
-RUN flutter build web
+# Build the Flutter web application
+RUN flutter build web --release
 
 # Use Nginx to serve the Flutter web app
 FROM nginx:stable-alpine

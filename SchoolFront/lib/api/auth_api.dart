@@ -43,6 +43,7 @@ class AuthApi extends Api{
 
   Future<String?> registerUser(User newUser) async {
     final url = Uri.parse('$_baseUrl/register');
+    print(url);
     try {
       final response = await http.post(
         url,
