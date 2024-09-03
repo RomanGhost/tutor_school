@@ -41,7 +41,7 @@ class UserService(
         val existingUser = userRepository.findByEmail(user.email)
             ?: throw IllegalArgumentException("User with this email does not exist")
 
-        val updatedUser = if (user.password.isNotBlank()) {
+        val updatedUser = if (user.password.isNotBlank() && user.password.isNotEmpty()) {
             // Шифрование пароля, если он был обновлен
             val encryptedPassword = passwordEncoder.encode(user.password)
             existingUser.copy(

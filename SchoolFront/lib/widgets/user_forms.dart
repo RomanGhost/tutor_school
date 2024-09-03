@@ -158,7 +158,7 @@ class UserForms{
       obscureText: true,
       validator: (value) {
         if (value != null && value.isNotEmpty && value.length<6) {
-          return 'PПароль должен быть больше 6 символов';
+          return 'Пароль должен быть больше 6 символов';
         }
         return null;
       },

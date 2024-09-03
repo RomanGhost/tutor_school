@@ -1,6 +1,7 @@
 package com.open_inc.SchoolBack.controllers
 
 import com.open_inc.SchoolBack.configs.JWTUtil
+import com.open_inc.SchoolBack.dataclasses.auth.SignUpRequest
 import com.open_inc.SchoolBack.models.User
 import com.open_inc.SchoolBack.services.UserService
 
@@ -26,15 +27,24 @@ class UserController(private val userService: UserService, private val jwtUtil: 
     }
 
     @PutMapping("/update")
-    fun updateUser(@RequestBody user: User, @RequestHeader("Authorization") token: String): ResponseEntity<User> {
+    fun updateUser(@RequestBody userSignUp: SignUpRequest, @RequestHeader("Authorization") token: String): ResponseEntity<User> {
         val jwtToken = token.replace("Bearer ", "")
         val userEmail = jwtUtil.getUsernameFromToken(jwtToken)
 
-        if (userEmail != user.email) {
+        if (userEmail != userSignUp.email) {
             return ResponseEntity(HttpStatus.UNAUTHORIZED)
         }
+        val existUser = userService.getUserByEmail(userEmail)
+        val updateUser = User(
+            email = userSignUp.email,
+            firstName = userSignUp.firstName,
+            lastName = userSignUp.lastName,
+            surname = userSignUp.surname,
+            password = userSignUp.password,
+            role = existUser!!.role,
+        )
 
-        val updatedUser = userService.updateUser(user) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+        val updatedUser = userService.updateUser(updateUser)
         return ResponseEntity.ok(updatedUser)
     }
 }

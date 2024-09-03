@@ -45,7 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           } else {
             // Показ ошибки
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Не смогли зарегестрировать')),
+              SnackBar(content: Text('Не смогли зарегистрировать')),
             );
           }
         } catch (e) {
