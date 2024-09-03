@@ -25,7 +25,7 @@ COPY . .
 RUN flutter pub get
 
 # Build the Flutter web application
-RUN flutter build web --release
+RUN flutter build web --release --dart-define=BASE_URL=$BASE_URL
 
 # Use Nginx to serve the Flutter web app
 FROM nginx:stable-alpine
