@@ -20,4 +20,4 @@ docker-compose build
 docker-compose up -d
 ```
 
-за помощь в настройке разворачивания проекта: @github/alexvancasper
+за помощь в настройке разворачивания проекта: @alexvancasper
