@@ -11,8 +11,6 @@ class EnrollNewSubjectScreen extends StatefulWidget {
 class _EnrollNewSubjectScreenState extends State<EnrollNewSubjectScreen> {
   List<Subject> availableSubjects = [];
   SubjectApi subjectApi = SubjectApi();
-  final screenWidth = MediaQuery.of(context).size.width;
-  final crossAxisCount = screenWidth < 600 ? 2 : 4;
 
   @override
   void initState() {
@@ -30,6 +28,8 @@ class _EnrollNewSubjectScreenState extends State<EnrollNewSubjectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisCount = screenWidth < 600 ? 2 : 4;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Запись'),
