@@ -9,7 +9,8 @@ class CorsConfig : WebMvcConfigurer {
         registry.addMapping("/**")
             .allowedOrigins("http://localhost:8000",       // Для локальной разработки
                 "http://localhost",           // Фронтенд в Docker-контейнере
-                "http://frontend",            // Внутреннее имя контейнера для фронтенда
+                "http://frontend",
+                "http://frontend:8000",            // Внутреннее имя контейнера для фронтенда
                 "http://frontend:80")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("Content-Type", "Authorization")
