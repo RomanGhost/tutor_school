@@ -45,44 +45,50 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Мои предметы'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _onEnrollNew,
-          ),
-        ],
-      ),
-      drawer: SideMenu(), // Добавление боковой панели
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: subjects.isEmpty
-            ? Center(
-          child: Text(
-            'Нет записанных предметов',
-            style: TextStyle(fontSize: 18, color: Colors.grey[700]),
-          ),
-        )
-            : GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            childAspectRatio: 3 / 2,
-            crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
-          ),
-          itemCount: subjects.length,
-          itemBuilder: (context, index) {
-            final subject = subjects[index];
-            return SubjectCard(
-              subject: subject,
-              onCancel: _onCancel,
-            );
-          },
+Widget build(BuildContext context) {
+  // Получаем ширину экрана
+  final screenWidth = MediaQuery.of(context).size.width;
+
+  // Устанавливаем количество колонок в зависимости от ширины экрана
+  final crossAxisCount = screenWidth < 600 ? 2 : 4; // 2 колонки для мобильных устройств, 4 — для больших экранов
+
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Мои предметы'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: _onEnrollNew,
         ),
-      ),
-    );
-  }
+      ],
+    ),
+    drawer: SideMenu(), // Добавление боковой панели
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: subjects.isEmpty
+          ? Center(
+              child: Text(
+                'Нет записанных предметов',
+                style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+              ),
+            )
+          : GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount, // Используем динамическое количество колонок
+                childAspectRatio: 3 / 2,
+                crossAxisSpacing: 8.0,
+                mainAxisSpacing: 8.0,
+              ),
+              itemCount: subjects.length,
+              itemBuilder: (context, index) {
+                final subject = subjects[index];
+                return SubjectCard(
+                  subject: subject,
+                  onCancel: _onCancel,
+                );
+              },
+            ),
+    ),
+  );
+}
 }
