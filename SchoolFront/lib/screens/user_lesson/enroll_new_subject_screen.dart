@@ -11,6 +11,7 @@ class EnrollNewSubjectScreen extends StatefulWidget {
 class _EnrollNewSubjectScreenState extends State<EnrollNewSubjectScreen> {
   List<Subject> availableSubjects = [];
   SubjectApi subjectApi = SubjectApi();
+  final crossAxisCount = screenWidth < 600 ? 2 : 4;
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _EnrollNewSubjectScreenState extends State<EnrollNewSubjectScreen> {
         padding: const EdgeInsets.all(16.0),
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
+            crossAxisCount: crossAxisCount,
             childAspectRatio: 3 / 3,
             crossAxisSpacing: 8.0,
             mainAxisSpacing: 8.0,
