@@ -1,31 +1,28 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
 import 'package:school/api/api_interface.dart';
 import 'package:school/dataclasses/review.dart';
-
+import 'package:school/service/jwt_work.dart';
 import '../dataclasses/config.dart';
-import '../service/jwt_work.dart';
+import 'api_client.dart';
 
-class ReviewApi extends Api{
+class ReviewApi extends Api {
   final String _baseUrl = '${Config.baseUrl}/api/review';
+  late final ApiClient _apiClient;
 
-  Future<List<Review>> getAllReview() async{
-    final url = Uri.parse('$_baseUrl/get_all');
+  ReviewApi() {
+    _apiClient = ApiClient(_baseUrl); // Инициализация ApiClient
+  }
+
+  /// Получение всех отзывов
+  Future<List<Review>> getAllReview() async {
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      );
+      final result = await _apiClient.getRequest('get_all', headers: {
+        'Content-Type': 'application/json',
+      });
 
-      if (response.statusCode == 200) {
-        final result = json.decode(response.body) as List<dynamic>;
-        // print(result);
+      if (result != null) {
         List<Review> resultReview = List.empty(growable: true);
-        //
-        for (var reviewJson in result){
+
+        for (var reviewJson in result) {
           Review newReview = Review(
             rate: reviewJson['rate'],
             text: reviewJson['text'],
@@ -36,37 +33,37 @@ class ReviewApi extends Api{
         }
         return resultReview;
       } else {
-        logError('Failed to get lesson', response);
         return [];
       }
     } catch (e) {
-      print('Error occurred while fetching lesson: $e');
+      print('Error occurred while fetching reviews: $e');
       return [];
     }
   }
 
-  Future<void> addNewReview(Review review) async{
+  /// Добавление нового отзыва
+  Future<void> addNewReview(Review review) async {
     final jwt = await JwtWork().getJwt();
     if (jwt == null) {
       print('No JWT found, user may not be authenticated.');
       return;
     }
 
-    final url = Uri.parse('$_baseUrl/add');
     try {
-      final response = await http.post(
-        url,
+      final result = await _apiClient.postRequest(
+        'add',
+        review.getJson(),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $jwt',
         },
-        body: json.encode(review.getJson()),
       );
-      if (response.statusCode != 200) {
-        logError('Failed to send review', response);
+
+      if (result == null) {
+        print('Failed to send review');
       }
     } catch (e) {
-      print('Error occurred while fetching review: $e');
+      print('Error occurred while adding review: $e');
     }
   }
 }

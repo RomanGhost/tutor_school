@@ -62,7 +62,7 @@ class LessonController (
         val userEmail = jwtUtil.getUsernameFromToken(jwtToken)
 
         val nextLesson = lessonService.getNextUserLesson(userEmail, OffsetDateTime.now()) ?:
-            return ResponseEntity.notFound()
+            return ResponseEntity.noContent()
 
         val lessonData = LessonData(
             id =nextLesson.id,
@@ -93,7 +93,7 @@ class LessonController (
             id =returnLesson.id,
             subject =newLesson.userSubject.subject.name,
             plainDateTime = newLesson.plainDateTime,
-            status = newLesson.status.name!!,
+            status = newLesson.status.name,
         )
 
         return ResponseEntity.ok(returnLessonData)

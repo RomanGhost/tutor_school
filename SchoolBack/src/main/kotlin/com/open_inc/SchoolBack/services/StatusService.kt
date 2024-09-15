@@ -9,6 +9,6 @@ class StatusService(
     private val statusRepository: StatusRepository
 ) {
     fun getStatusByName(name:String): Status {
-        return statusRepository.findStatusByName(name)
+        return statusRepository.getReferenceById(name)
     }
 }

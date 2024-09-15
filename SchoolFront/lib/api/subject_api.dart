@@ -1,149 +1,140 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
-
+import 'package:school/dataclasses/subject.dart';
+import 'package:school/service/jwt_work.dart';
 import '../dataclasses/config.dart';
-import '../dataclasses/subject.dart';
-import '../service/jwt_work.dart';
+import 'api_client.dart';
 import 'api_interface.dart';
 
-class SubjectApi extends Api{
+class SubjectApi extends Api {
   final String _baseUrl = '${Config.baseUrl}/api';
+  late final ApiClient _apiClient;
 
-  Future<List<Subject>> getAvailableSubjects() async{
+  SubjectApi() {
+    _apiClient = ApiClient(_baseUrl); // Инициализация ApiClient
+  }
+
+  /// Получить доступные предметы для пользователя
+  Future<List<Subject>> getAvailableSubjects() async {
     final jwt = await JwtWork().getJwt();
     if (jwt == null) {
       print('No JWT found, user may not be authenticated.');
       return List<Subject>.empty();
     }
 
-    final url = Uri.parse('$_baseUrl/subject/get_access_user');
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $jwt',
-        },
-      );
-      if (response.statusCode == 200) {
-        final result = json.decode(response.body) as List<dynamic>;
-        // print(result);
+      // Используем метод GET из ApiClient
+      final result = await _apiClient.getRequest('subject/get_access_user', headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwt',
+      });
+
+      if (result != null) {
         List<Subject> resultLessons = List.empty(growable: true);
-        //
-        for (var lessonJson in result){
+
+        for (var subjectJson in result) {
           Subject newSubject = Subject(
-              id: lessonJson['id'],
-              name: lessonJson['name'],
-              price: lessonJson['price'],
+            id: subjectJson['id'],
+            name: subjectJson['name'],
+            price: subjectJson['price'],
           );
           resultLessons.add(newSubject);
         }
         return resultLessons;
       } else {
-        logError('Failed to get lesson', response);
+        return List<Subject>.empty();
       }
     } catch (e) {
-      print('Error occurred while fetching lesson: $e');
+      print('Error occurred while fetching subjects: $e');
+      return List<Subject>.empty();
     }
-    return List<Subject>.empty();
   }
 
-  Future<void> addSubjectUser(Subject subject) async{
+  /// Добавить новый предмет для пользователя
+  Future<void> addSubjectUser(Subject subject) async {
     final jwt = await JwtWork().getJwt();
     if (jwt == null) {
       print('No JWT found, user may not be authenticated.');
       return;
     }
 
-    final url = Uri.parse('$_baseUrl/user_subject/add');
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $jwt',
-        },
-        body: json.encode({
-          'id':subject.id,
-          'name':subject.name,
-          'price':subject.price,
-          'level':subject.level,
-        }),
-      );
-      if (response.statusCode != 200) {
-        logError('Failed to get lesson', response);
-      }
+      // Используем метод POST из ApiClient
+      await _apiClient.postRequest('user_subject/add', {
+        'id': subject.id,
+        'name': subject.name,
+        'price': subject.price,
+        'level': subject.level,
+      }, headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwt',
+      });
     } catch (e) {
-      print('Error occurred while fetching lesson: $e');
+      print('Error occurred while adding subject: $e');
     }
   }
 
-  Future<List<Subject>> getUserSubjects() async{
+  /// Получить предметы пользователя
+  Future<List<Subject>> getUserSubjects() async {
     final jwt = await JwtWork().getJwt();
     if (jwt == null) {
       print('No JWT found, user may not be authenticated.');
       return List<Subject>.empty();
     }
 
-    final url = Uri.parse('$_baseUrl/user_subject/getuserall');
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $jwt',
-        },
-      );
-      if (response.statusCode == 200) {
-        final result = json.decode(response.body) as List<dynamic>;
-        List<Subject> resultSubject = List.empty(growable: true);
-        for (var subjectJson in result){
+      // Используем метод GET из ApiClient
+      final result =
+      await _apiClient.getRequest('user_subject/getuserall', headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwt',
+      });
+
+      if (result != null) {
+        List<Subject> resultSubjects = List.empty(growable: true);
+
+        for (var subjectJson in result) {
           Subject newSubject = Subject(
             id: subjectJson['id'],
             name: subjectJson['name'],
             price: subjectJson['price'],
-            level:subjectJson['level']
+            level: subjectJson['level'],
           );
-          resultSubject.add(newSubject);
+          resultSubjects.add(newSubject);
         }
-        return resultSubject;
+        return resultSubjects;
       } else {
-        logError('Failed to get lesson', response);
+        return List<Subject>.empty();
       }
     } catch (e) {
-      print('Error occurred while fetching lesson: $e');
+      print('Error occurred while fetching user subjects: $e');
+      return List<Subject>.empty();
     }
-    return List<Subject>.empty();
   }
 
-  Future<void> deleteUserSubject(Subject subject) async{
+  /// Удалить предмет пользователя
+  Future<void> deleteUserSubject(Subject subject) async {
     final jwt = await JwtWork().getJwt();
     if (jwt == null) {
       print('No JWT found, user may not be authenticated.');
       return;
     }
 
-    final url = Uri.parse('$_baseUrl/user_subject/delete');
     try {
-      final response = await http.delete(
-        url,
+      // Используем метод DELETE из ApiClient
+      await _apiClient.deleteRequest(
+        'user_subject/delete',  // Позиционный аргумент - только один
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $jwt',
         },
-        body: json.encode({
-          'id':subject.id,
-          'name':subject.name,
-          'price':subject.price,
-          'level':subject.level,
-        }),
+        body: {
+          'id': subject.id,
+          'name': subject.name,
+          'price': subject.price,
+          'level': subject.level,
+        },
       );
-      if (response.statusCode != 200) {
-        logError('Failed to get lesson', response);
-      }
     } catch (e) {
-      print('Error occurred while fetching lesson: $e');
+      print('Error occurred while deleting subject: $e');
     }
   }
 }

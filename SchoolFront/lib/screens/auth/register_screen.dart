@@ -25,7 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         final newUser;
         try {
           newUser = userForms.getUser(checkPassword: true);
-        }on PasswordError{
+        } on PasswordError {
           _showErrorSnackbar('Слишком легкий пароль');
           return;
         }
@@ -75,28 +75,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      userForms.buildFirstNameField(),
+                      userForms.buildFirstNameField(
+                        onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                      ),
                       SizedBox(height: 20),
-                      userForms.buildLastNameField(),
+                      userForms.buildLastNameField(
+                        onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                      ),
                       SizedBox(height: 20),
-                      userForms.buildSurnameField(),
+                      userForms.buildSurnameField(
+                        onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                      ),
                       SizedBox(height: 20),
-                      userForms.buildEmailNameField(),
+                      userForms.buildEmailNameField(
+                        onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                      ),
                       SizedBox(height: 20),
-                      userForms.buildPasswordField(),
+                      userForms.buildPasswordField(
+                        onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+                      ),
                       SizedBox(height: 20),
-                      userForms.buildConfirmPasswordField(),
+                      userForms.buildConfirmPasswordField(
+                        onFieldSubmitted: (_) => _submit(),
+                      ),
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF6498E4)
+                          backgroundColor: Color(0xFF6498E4),
                         ),
                         child: const Text(
-                            'Зарегистрироваться',
-                          style: TextStyle(
-                              color: Colors.white
-                          ),
+                          'Зарегистрироваться',
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ],
