@@ -10,7 +10,6 @@ class StudentsScreen extends StatefulWidget {
 }
 
 class _StudentsScreenState extends State<StudentsScreen> {
-  // Пример данных о студентах
   List<Student> students = [];
   final StudentApi _studentApi = StudentApi();
 
@@ -22,6 +21,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
   void _initialize() async {
     List<Student> getStudents = await _studentApi.getStudents();
+
 
     setState(() {
       students = getStudents;
@@ -66,7 +66,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
       builder: (context) {
         return AlertDialog(
           title: Text('Информация об ученике'),
-          content: Text('Имя: ${student.firstName}\nФамилия: ${student.lastName}\nEmail: ${student.email}\nИзучаемый предмет:${student.subject}'),
+          content: Text('Имя: ${student.firstName}\nФамилия: ${student.lastName}\nEmail: ${student.email}\nИзучаемый предмет:${student.subject}(${student.level})'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),

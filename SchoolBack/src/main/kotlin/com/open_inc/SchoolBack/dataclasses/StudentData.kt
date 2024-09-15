@@ -6,4 +6,5 @@ data class StudentData(
     val lastName:String,
     val email:String,
     val subject:String,
+    val level:String,
 )
