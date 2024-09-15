@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-
 import '../../../dataclasses/subject.dart';
 
 class SubjectCard extends StatelessWidget {
   final Subject subject;
-  final Function(int) onCancel;
+  final bool isEnrolled; // Флаг для того, записан пользователь или нет
+  final Function()? onCancel; // Изменённая функция, теперь она без параметров
+  final Function()? onEnroll; // Функция для записи на предмет
 
   const SubjectCard({
     Key? key,
     required this.subject,
-    required this.onCancel,
+    this.isEnrolled = false, // По умолчанию false, если предмет не записан
+    this.onCancel,
+    this.onEnroll,
   }) : super(key: key);
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
@@ -18,7 +21,8 @@ class SubjectCard extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Подтвердите удаление'),
-          content: Text('Вы уверены, что хотите отменить запись на предмет "${subject.name}"?(Все будущие предметы удалятся)'),
+          content: Text(
+              'Вы уверены, что хотите отменить запись на предмет "${subject.name}"? (Все будущие предметы удалятся)'),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -33,8 +37,8 @@ class SubjectCard extends StatelessWidget {
       },
     ) ?? false;
 
-    if (shouldDelete) {
-      onCancel(subject.id);
+    if (shouldDelete && onCancel != null) {
+      onCancel!(); // Вызов onCancel без аргументов
     }
   }
 
@@ -65,11 +69,12 @@ class SubjectCard extends StatelessWidget {
               style: TextStyle(fontSize: 14, color: Colors.grey[700]),
             ),
             Text(
-              'Уровень: ${subject.level}',
+              'Уровень: ${subject.level ?? "Уровень не определен"}',
               style: TextStyle(fontSize: 14, color: Colors.grey[700]),
             ),
             const SizedBox(height: 16),
-            ElevatedButton.icon(
+            isEnrolled
+                ? ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent[200],
                 minimumSize: Size.zero,
@@ -90,6 +95,17 @@ class SubjectCard extends StatelessWidget {
                   fontSize: 14,
                   color: Colors.white,
                 ),
+              ),
+            )
+                : ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF6498E4),
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              ),
+              onPressed: onEnroll, // Используем onEnroll для записи
+              child: const Text(
+                'Записаться',
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ],
