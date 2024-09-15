@@ -33,15 +33,20 @@ class _TeacherLessonsScreenState extends State<TeacherLessonsScreen> {
 
   void _approveLesson(Lesson lesson) async {
     try {
-      final success = await _lessonApi.approveLesson(lesson.id);
-      if (success != null) {
+      final updatedLesson = await _lessonApi.approveLesson(lesson.id);
+      if (updatedLesson != null) {
         setState(() {
-          for(TeacherLesson lessonFromList in _proposedLessons){
-            if(lessonFromList.lesson.id == lesson.id){
-              lessonFromList = success;
+          // Обновляем статус урока в списке
+          for (int i = 0; i < _proposedLessons.length; i++) {
+            if (_proposedLessons[i].lesson.id == lesson.id) {
+              _proposedLessons[i] = TeacherLesson(
+                lesson: updatedLesson.lesson,
+                firstName: _proposedLessons[i].firstName,
+                lastName: _proposedLessons[i].lastName,
+              );
+              break;
             }
           }
-          // _proposedLessons.removeWhere((tl) => tl.lesson.id == lesson.id);
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Lesson approved')),
@@ -55,6 +60,7 @@ class _TeacherLessonsScreenState extends State<TeacherLessonsScreen> {
       print('Failed to approve lesson: $e');
     }
   }
+
 
   void _rejectLesson(Lesson lesson) async {
     try {
@@ -75,6 +81,7 @@ class _TeacherLessonsScreenState extends State<TeacherLessonsScreen> {
       print('Failed to reject lesson: $e');
     }
   }
+
 
   Color _getStatusColor(String status) {
     switch (status) {

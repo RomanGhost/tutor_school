@@ -38,6 +38,7 @@ class StudentApi extends Api {
             lastName: studentJson['lastName'],
             email: studentJson['email'],
             subject: studentJson['subject'],
+            level: studentJson['level'],
           );
           resultList.add(newStudent);
         }

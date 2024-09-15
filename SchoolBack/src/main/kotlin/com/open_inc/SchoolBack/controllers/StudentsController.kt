@@ -24,6 +24,8 @@ class StudentsController(
         val userSubject = userSubjectService.getAllUserSubject()
         val listStudent = mutableListOf<StudentData>()
         for (us in userSubject){
+
+            us.level.name
             if (us.user.email != userEmail) {
                 val student = StudentData(
                     id = us.user.id,
@@ -31,6 +33,7 @@ class StudentsController(
                     lastName = us.user.lastName,
                     email = us.user.email,
                     subject = us.subject.name,
+                    level = us.level.name,
                 )
                 listStudent.add(student)
             }

@@ -19,3 +19,5 @@ docker-compose build
 ```shell
 docker-compose up -d
 ```
+
+за помощь в настройке разворачивания проекта: @alexvancasper
