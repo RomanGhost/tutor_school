@@ -24,7 +24,8 @@ class UserSubjectController(
         val userEmail = jwtUtil.getUsernameFromToken(jwtToken)
         val user = userService.getUserByEmail(userEmail)
         val subject = subjectService.getSubjectByName(subjectGet.name)
-        val level = levelService.getLevelByName(subjectGet.level!!)
+        val level = levelService.getLevelByName(subjectGet.level?:"A1")?:levelService.getLevelByName("A1")
+
 
         val userSubject = UserSubject(user=user!!, subject=subject, level=level!!)
 
@@ -46,7 +47,7 @@ class UserSubjectController(
                     id = userSubject.id,
                     name = userSubject.subject.name,
                     level = userSubject.level.name,
-                    price = userSubject.subject.price?:0f
+                    price = userSubject.subject.price
                 )
             )
         }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../dataclasses/user.dart';
 import '../errors/user_errors.dart';
 
-class UserForms{
+class UserForms {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _surnameController = TextEditingController();
@@ -15,11 +15,10 @@ class UserForms{
   String getLastName() => _lastNameController.text;
   String getSurname() => _surnameController.text;
   String getEmail() => _emailController.text;
-  String getPasswordController() => _passwordController.text;
-  String getConfirmPasswordController() => _confirmPasswordController.text;
+  String getPassword() => _passwordController.text;
+  String getConfirmPassword() => _confirmPasswordController.text;
 
-
-  void dispose(){
+  void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _surnameController.dispose();
@@ -28,36 +27,36 @@ class UserForms{
     _confirmPasswordController.dispose();
   }
 
-  UserForms(User user){
+  UserForms(User user) {
     _emailController.text = user.email;
     _firstNameController.text = user.firstName;
     _lastNameController.text = user.lastName;
     _surnameController.text = user.surname;
   }
 
-  UserForms.undefined(){
+  UserForms.undefined() {
     _emailController.text = "";
     _firstNameController.text = "";
     _lastNameController.text = "";
     _surnameController.text = "";
   }
 
-  User getUser({bool checkPassword=false}){
+  User getUser({bool checkPassword = false}) {
     User newUser = User.undefined();
     newUser.email = _emailController.text;
     newUser.firstName = _firstNameController.text;
     newUser.lastName = _lastNameController.text;
     newUser.surname = _surnameController.text;
-    if (_passwordController.text.isNotEmpty && _passwordController.text == _confirmPasswordController.text){
+    if (_passwordController.text.isNotEmpty &&
+        _passwordController.text == _confirmPasswordController.text) {
       newUser.password = _passwordController.text;
-    }else{
-      if(checkPassword)
-        throw PasswordError("Пароли не совпадают");
+    } else {
+      if (checkPassword) throw PasswordError("Пароли не совпадают");
     }
     return newUser;
   }
 
-  User getUserLogin(){
+  User getUserLogin() {
     User loginUser = User.undefined();
     loginUser.email = _emailController.text;
     loginUser.password = _passwordController.text;
@@ -65,34 +64,7 @@ class UserForms{
     return loginUser;
   }
 
-  Widget buildEmailNameField() {
-    return TextFormField(
-      controller: _emailController,
-      decoration: InputDecoration(
-        labelText: 'Email',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      validator: (value) {
-        const emailPattern = r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+$";
-        final emailRegex = RegExp(emailPattern);
-        final formattedEmail = value.toString().toLowerCase();
-        if (value == null || value.isEmpty) {
-          return 'Введи email';
-        }
-        if (value.length < 3) {
-          return 'Длина должна быть больше 3 символов';
-        }
-        if(!emailRegex.hasMatch(formattedEmail)){
-          return 'Почта неверна';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget buildFirstNameField() {
+  Widget buildFirstNameField({void Function(String)? onFieldSubmitted}) {
     return TextFormField(
       controller: _firstNameController,
       decoration: InputDecoration(
@@ -101,31 +73,21 @@ class UserForms{
           borderRadius: BorderRadius.circular(10),
         ),
       ),
+      onFieldSubmitted: onFieldSubmitted,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Имя';
+          return 'Введите имя';
         }
         if (value.length < 3) {
-          return 'Длина должна быть больше 3 символов';
+          return 'Имя должно быть не менее 3 символов';
         }
         return null;
       },
+      autofillHints: [AutofillHints.givenName], // Автозаполнение имени
     );
   }
 
-  Widget buildSurnameField() {
-    return TextFormField(
-      controller: _surnameController,
-      decoration: InputDecoration(
-        labelText: 'Отчество',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  }
-
-  Widget buildLastNameField() {
+  Widget buildLastNameField({void Function(String)? onFieldSubmitted}) {
     return TextFormField(
       controller: _lastNameController,
       decoration: InputDecoration(
@@ -134,19 +96,66 @@ class UserForms{
           borderRadius: BorderRadius.circular(10),
         ),
       ),
+      onFieldSubmitted: onFieldSubmitted,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return "Введи фамилию";
+          return 'Введите фамилию';
         }
         if (value.length < 3) {
-          return "Длина должна быть больше 3 символов";
+          return 'Фамилия должна быть не менее 3 символов';
         }
         return null;
       },
+      autofillHints: [AutofillHints.familyName], // Автозаполнение фамилии
     );
   }
 
-  Widget buildPasswordField() {
+  Widget buildSurnameField({void Function(String)? onFieldSubmitted}) {
+    return TextFormField(
+      controller: _surnameController,
+      decoration: InputDecoration(
+        labelText: 'Отчество',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      onFieldSubmitted: onFieldSubmitted,
+      validator: (value) {
+        if (value != null && value.isNotEmpty && value.length < 3) {
+          return 'Отчество должно быть не менее 3 символов';
+        }
+        return null;
+      },
+      autofillHints: [AutofillHints.middleName], // Автозаполнение отчества (не всегда поддерживается)
+    );
+  }
+
+  Widget buildEmailNameField({void Function(String)? onFieldSubmitted}) {
+    return TextFormField(
+      controller: _emailController,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      onFieldSubmitted: onFieldSubmitted,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Введите email';
+        }
+        final emailPattern = r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+$";
+        final emailRegex = RegExp(emailPattern);
+        if (!emailRegex.hasMatch(value)) {
+          return 'Некорректный email';
+        }
+        return null;
+      },
+      autofillHints: [AutofillHints.email], // Автозаполнение email
+    );
+  }
+
+  Widget buildPasswordField({void Function(String)? onFieldSubmitted}) {
     return TextFormField(
       controller: _passwordController,
       decoration: InputDecoration(
@@ -156,16 +165,21 @@ class UserForms{
         ),
       ),
       obscureText: true,
+      onFieldSubmitted: onFieldSubmitted,
       validator: (value) {
-        if (value != null && value.isNotEmpty && value.length<6) {
-          return 'Пароль должен быть больше 6 символов';
+        if (value == null || value.isEmpty) {
+          return 'Введите пароль';
+        }
+        if (value.length < 6) {
+          return 'Пароль должен быть не менее 6 символов';
         }
         return null;
       },
+      autofillHints: [AutofillHints.newPassword], // Автозаполнение нового пароля
     );
   }
 
-  Widget buildConfirmPasswordField() {
+  Widget buildConfirmPasswordField({void Function(String)? onFieldSubmitted}) {
     return TextFormField(
       controller: _confirmPasswordController,
       decoration: InputDecoration(
@@ -175,12 +189,19 @@ class UserForms{
         ),
       ),
       obscureText: true,
+      onFieldSubmitted: onFieldSubmitted,
       validator: (value) {
-        if (_passwordController.text.isNotEmpty && value != _passwordController.text) {
+        if (_passwordController.text != value) {
           return 'Пароли не совпадают';
         }
         return null;
       },
+      autofillHints: [AutofillHints.password], // Автозаполнение подтверждения пароля
     );
+  }
+
+  bool validateForm(GlobalKey<FormState> formKey) {
+    final form = formKey.currentState;
+    return form != null && form.validate();
   }
 }

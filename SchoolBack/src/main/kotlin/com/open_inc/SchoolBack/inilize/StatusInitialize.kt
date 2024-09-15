@@ -11,13 +11,19 @@ import org.springframework.stereotype.Component
 class StatusInitialize @Autowired constructor(private val statusRepository: StatusRepository){
     @PostConstruct
     fun init() {
-        try{
-        statusRepository.save(Status(name="Создан"))
-        statusRepository.save(Status(name="Подтвержден"))
-        statusRepository.save(Status(name="Отменен"))
-        statusRepository.save(Status(name="Проведен"))
-        }catch (e: DataIntegrityViolationException) {
-            print("Error adding statuses") // Логируем исключение для отладки
-        }
+        val statuses = listOf("Создан", "Подтвержден", "Отменен", "Проведен")
+
+            for (status in statuses){
+                try{
+//                if (statusRepository.findStatusByName(status).name == status)
+                    statusRepository.save(Status(name=status))
+                }catch (e: DataIntegrityViolationException) {
+                    print("Error adding statuses") // Логируем исключение для отладки
+                }
+            }
+//            statusRepository.save(Status(name="Создан"))
+//            statusRepository.save(Status(name="Подтвержден"))
+//            statusRepository.save(Status(name="Отменен"))
+//            statusRepository.save(Status(name="Проведен"))
     }
 }

@@ -1,87 +1,70 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:school/service/jwt_work.dart';
-
 import '../dataclasses/config.dart';
 import '../dataclasses/user.dart';
+import 'api_client.dart';
 import 'api_interface.dart';
 
-class AuthApi extends Api{
-  final String _baseUrl = '${Config.baseUrl}/api/auth'; // Замените на ваш IP
-  String? _jwt;
+class AuthApi extends Api {
+  final String _baseUrl = '${Config.baseUrl}/api/auth'; // Используем конфигурацию
+  late final ApiClient _apiClient;
 
+  AuthApi() {
+    _apiClient = ApiClient(_baseUrl); // Инициализация ApiClient с базовым URL
+  }
+
+  /// Аутентификация пользователя
   Future<String?> authenticateUser(User user) async {
-    final url = Uri.parse('$_baseUrl/login');
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'email': user.email,
-          'password': user.password,
-        }),
-      );
+    final response = await _apiClient.postRequest(
+      'login',
+      {
+        'email': user.email,
+        'password': user.password,
+      },
+      headers: {'Content-Type': 'application/json'},
+    );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body) as Map<String, dynamic>;
-        final jwt = responseData['jwt'] as String?;
-        if (jwt != null) {
-          _jwt = jwt;
-          await JwtWork().saveJwt(jwt);
-          return jwt;
-        }
-      } else {
-        _logError('Failed to login', response);
+    if (response != null && response.containsKey('jwt')) {
+      final jwt = response['jwt']?.toString();
+      if (jwt != null) {
+        await JwtWork().saveJwt(jwt); // Сохраняем JWT в хранилище
+        final decodedToken = JwtDecoder.decode(jwt);
+        final email = decodedToken['sub'] as String?;
+        return jwt;
       }
-    } catch (e) {
-      print('Error occurred while logging in: $e');
     }
     return null;
   }
 
+  /// Регистрация нового пользователя
   Future<String?> registerUser(User newUser) async {
-    final url = Uri.parse('$_baseUrl/register');
-    print(url);
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'firstName': newUser.firstName,
-          'lastName': newUser.lastName,
-          'surname': newUser.surname,
-          'email': newUser.email,
-          'password': newUser.password,
-        }),
-      );
+    final response = await _apiClient.postRequest(
+      'register',
+      {
+        'firstName': newUser.firstName,
+        'lastName': newUser.lastName,
+        'surname': newUser.surname,
+        'email': newUser.email,
+        'password': newUser.password,
+      },
+      headers: {'Content-Type': 'application/json'},
+    );
 
-      if (response.statusCode == 200) {
-        print('User registered successfully');
-        final responseData = json.decode(response.body) as Map<String, dynamic>;
-        final jwt = responseData['jwt'] as String?;
-        if (jwt != null) {
-          _jwt = jwt;
-          await JwtWork().saveJwt(jwt);
-          return jwt;
-        }
-      } else {
-        _logError('Failed to register', response);
+    if (response != null && response.containsKey('jwt')) {
+      final jwt = response['jwt']?.toString();
+      if (jwt != null) {
+        await JwtWork().saveJwt(jwt); // Сохраняем JWT
+        return jwt;
       }
-    } catch (e) {
-      print('Error occurred while registering: $e');
     }
     return null;
   }
 
+  /// Логаут
   void logout() async {
-
-    await JwtWork().clearJwt();
-    _jwt = null;
-  }
-
-  void _logError(String message, http.Response response) {
-    print('$message: ${response.statusCode} ${response.body}');
+    await JwtWork().clearJwt(); // Очищаем токен
   }
 }

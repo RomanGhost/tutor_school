@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:school/api/lesson_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,6 +46,7 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
         lessons = await _lessonApi.getLessonsForMonth(
             date.year, date.month); // Запрос уроков за месяц
       }
+
       _lessonsNotifier.value = _groupLessonsByDate(lessons);
     } catch (e) {
       print('Failed to initialize lessons for month: $e');
@@ -193,6 +195,7 @@ class _LessonCalendarWidgetState extends State<LessonCalendarWidget> {
         color: Color(0xFF66BB6A),
         shape: BoxShape.circle,
       ),
+
     );
   }
 

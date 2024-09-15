@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school/dataclasses/subject.dart';
 
-class SubjectPickerWidget extends StatelessWidget {
+class SubjectPickerWidget extends StatefulWidget {
   final List<Subject> subjects;
   final String? selectedSubject;
   final ValueChanged<String?> onSubjectSelected;
@@ -14,26 +14,42 @@ class SubjectPickerWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _SubjectPickerWidgetState createState() => _SubjectPickerWidgetState();
+}
+
+class _SubjectPickerWidgetState extends State<SubjectPickerWidget> {
+  String? _selectedSubject;
+
+  @override
+  void initState() {
+    super.initState();
+    // Устанавливаем первый предмет сразу
+    if (widget.subjects.isNotEmpty) {
+      _selectedSubject = widget.subjects.first.name;
+      widget.onSubjectSelected(_selectedSubject);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
       decoration: const InputDecoration(labelText: "Выберите предмет"),
-      value: _getSelectedValue(),
+      value: _selectedSubject,
       items: _buildDropdownMenuItems(),
-      onChanged: onSubjectSelected,
+      onChanged: (newValue) {
+        setState(() {
+          _selectedSubject = newValue;
+        });
+        widget.onSubjectSelected(newValue);
+      },
     );
   }
 
-  /// Получение текущего значения для выпадающего списка.
-  String? _getSelectedValue() {
-    return subjects.firstOrNull?.name ?? selectedSubject;
-  }
-
-  /// Создание элементов для выпадающего списка.
   List<DropdownMenuItem<String>> _buildDropdownMenuItems() {
-    return subjects.map((subject) {
+    return widget.subjects.map((subject) {
       return DropdownMenuItem<String>(
         value: subject.name,
-        child: Text("${subject.toString()}"),
+        child: Text(subject.name),
       );
     }).toList();
   }

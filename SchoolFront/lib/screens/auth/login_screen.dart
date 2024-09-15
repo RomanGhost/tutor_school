@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../api/auth_api.dart';
 import '../../dataclasses/user.dart';
 import '../../errors/user_errors.dart';
+import '../../service/jwt_work.dart';
 import '../../widgets/user_forms.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,27 +14,24 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final AuthApi _apiService = AuthApi();
   final UserForms userForms = UserForms.undefined();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    userForms.dispose();
     super.dispose();
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _initialize();
   }
 
   void _initialize() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jwt = prefs.getString('jwt');
+    String? jwt = await JwtWork().getJwt();
 
     if (jwt != null) {
       _navigateToUserProfile();
@@ -44,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final user;
     try {
       user = userForms.getUserLogin();
-    }on PasswordError{
+    } on PasswordError {
       _showErrorSnackbar('Слишком легкий пароль');
       return;
     }
@@ -63,8 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _storeJwt(String jwt) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('jwt', jwt);
+    await JwtWork().saveJwt(jwt);
   }
 
   void _navigateToUserProfile() {
@@ -76,11 +73,18 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-
   void _showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
+  }
+
+  void _tryLogin() {
+    if (userForms.validateForm(_formKey)) {
+      _login();
+    } else {
+      _showErrorSnackbar('Заполните все поля правильно');
+    }
   }
 
   @override
@@ -103,11 +107,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Form(
+                    key: _formKey,
                     child: Column(
                       children: <Widget>[
-                        userForms.buildEmailNameField(),
+                        userForms.buildEmailNameField(
+                            onFieldSubmitted: (_) => FocusScope.of(context).nextFocus()),
                         SizedBox(height: 16),
-                        userForms.buildPasswordField(),
+                        userForms.buildPasswordField(onFieldSubmitted: (_) => _tryLogin()),
                         SizedBox(height: 24),
                         _buildLoginButton(),
                         SizedBox(height: 8),
@@ -129,11 +135,11 @@ class _LoginScreenState extends State<LoginScreen> {
       style: ElevatedButton.styleFrom(
           backgroundColor: Color(0xFF6498E4)
       ),
-      onPressed: _login,
+      onPressed: _tryLogin,
       child: const Text(
         'Войти',
         style: TextStyle(
-          color: Colors.white
+            color: Colors.white
         ),
       ),
     );

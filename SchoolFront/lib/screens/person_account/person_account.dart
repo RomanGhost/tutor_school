@@ -6,6 +6,7 @@ import 'package:school/widgets/side_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../dataclasses/user.dart';
+import '../../service/jwt_work.dart';
 import 'widgets/next_lesson_widget.dart';
 
 
@@ -36,12 +37,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? jwt = prefs.getString('jwt');
     if(jwt == null) {
+      await JwtWork().clearJwt();
+      Navigator.pushNamed(context, '/login');
       throw JwtIsNull("Token is not valid");
     }
     Map<String, dynamic> decodedToken = JwtDecoder.decode(jwt);
     String? email = decodedToken['sub'];
 
     final user = await _apiService.getUser(email!);
+    if(user == null){
+      JwtWork().clearJwt();
+      Navigator.pushNamed(context, '/login');
+    }
     setState(() {
       _userData = user;
     });
@@ -66,7 +73,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             const Expanded(
               child: Center(
                 child: Text(
-                  'Welcome to your dashboard!',
+                  'Блок еще в разработке...',
                   style: TextStyle(fontSize: 22),
                 ),
               ),

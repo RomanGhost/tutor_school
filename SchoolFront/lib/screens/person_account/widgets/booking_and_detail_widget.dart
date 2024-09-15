@@ -170,12 +170,13 @@ class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
   Widget _buildSubjectPicker() {
     return SubjectPickerWidget(
       subjects: _availableSubjects,
-      selectedSubject: _selectedSubject,
+      selectedSubject: _selectedSubject, // Передаем выбранный предмет
       onSubjectSelected: (subject) => setState(() {
         _selectedSubject = subject;
       }),
     );
   }
+
 
   Widget _buildTimePicker() {
     return Row(
@@ -271,7 +272,20 @@ class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
   }
 
   String _formatDate(DateTime date) {
-    return "${date.day}.${date.month}.${date.year}";
+    int day = date.day;
+    int month = date.month;
+
+    String strDay = day.toString();
+    if(day < 10){
+      strDay = "0$day";
+    }
+
+    String strMonth = month.toString();
+    if(month < 10){
+      strMonth = "0$month";
+    }
+
+    return "$strDay.$strMonth.${date.year}";
   }
 
   void _showError(String message) {

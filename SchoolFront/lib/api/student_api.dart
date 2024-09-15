@@ -1,15 +1,19 @@
 import 'dart:convert';
-
-import 'package:http/http.dart' as http;
+import 'package:school/api/api_interface.dart';
 import 'package:school/dataclasses/student.dart';
-
+import 'package:school/service/jwt_work.dart';
 import '../dataclasses/config.dart';
-import '../service/jwt_work.dart';
-import 'api_interface.dart';
+import 'api_client.dart';
 
 class StudentApi extends Api {
   final String _baseUrl = '${Config.baseUrl}/api/student/teacher';
+  late final ApiClient _apiClient;
 
+  StudentApi() {
+    _apiClient = ApiClient(_baseUrl); // Инициализация ApiClient
+  }
+
+  /// Получение всех студентов
   Future<List<Student>> getStudents() async {
     final jwt = await JwtWork().getJwt();
     if (jwt == null) {
@@ -17,36 +21,33 @@ class StudentApi extends Api {
       return [];
     }
 
-    final url = Uri.parse('$_baseUrl/get_all');
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $jwt',
-        },
-      );
+      // Используем ApiClient для выполнения GET-запроса
+      final result = await _apiClient.getRequest('get_all', headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwt',
+      });
 
-      if (response.statusCode == 200) {
-        final result = json.decode(response.body) as List<dynamic>;
+      if (result != null) {
         final List<Student> resultList = [];
-        for(Map<String, dynamic> studentJson in result){
+
+        for (Map<String, dynamic> studentJson in result) {
           Student newStudent = Student(
-              id: studentJson['id'],
-              firstName: studentJson['firstName'],
-              lastName: studentJson['lastName'],
-              email: studentJson['email'],
-              subject: studentJson['subject'],
+            id: studentJson['id'],
+            firstName: studentJson['firstName'],
+            lastName: studentJson['lastName'],
+            email: studentJson['email'],
+            subject: studentJson['subject'],
           );
           resultList.add(newStudent);
-          return resultList;
         }
+        return resultList;
       } else {
-        logError('Failed to get student', response);
+        return [];
       }
     } catch (e) {
-      print('Error occurred while fetching student: $e');
+      print('Error occurred while fetching students: $e');
+      return [];
     }
-    return [];
   }
 }
