@@ -35,7 +35,7 @@ class UserSubjectService(
             userSubjectRepository.delete(userSubject)
         }catch (e: DataIntegrityViolationException){
             val lessons = lessonRepository.findLessonByUserSubject(userSubject).filter {
-                it.plainDateTime?.isAfter(OffsetDateTime.now()) == true
+                it.plainDateTime.isAfter(OffsetDateTime.now())
             }
             for (lesson in lessons){
                 lesson.isVisible = false

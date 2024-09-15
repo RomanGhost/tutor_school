@@ -50,13 +50,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     // Устанавливаем количество колонок в зависимости от ширины экрана
-    int crossAxisCount =(screenWidth ~/ 300)+1;
+    int crossAxisCount = (screenWidth ~/ 300) + 1;
 
-    // screenWidth < 900
-    //     ? 2
-    //     : screenWidth < 1200
-    //     ? 4
-    //     : 6; // Динамическое изменение колонок
     return Scaffold(
       appBar: AppBar(
         title: const Text('Мои предметы'),
@@ -96,6 +91,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                 subject: subject,
                 isEnrolled: true, // Это для записанных предметов
                 onCancel: () => _onCancel(subject.id),
+                showDropdown: false, // Отключаем выпадающее меню для этого экрана
               ),
             );
           },

@@ -56,7 +56,7 @@ class ApiClient {
 
   /// Обработка ответа
   dynamic _processResponse(http.Response response) {
-    //print("Response ${response.request}");
+    // print("Response ${response.request} with code ${response.statusCode}");
     if (response.statusCode == 200) {
       try {
         final responseBody = response.body;

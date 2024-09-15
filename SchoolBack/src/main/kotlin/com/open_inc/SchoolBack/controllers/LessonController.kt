@@ -5,14 +5,10 @@ import com.open_inc.SchoolBack.dataclasses.LessonData
 import com.open_inc.SchoolBack.dataclasses.TeacherLessonData
 import com.open_inc.SchoolBack.models.Lesson
 import com.open_inc.SchoolBack.services.*
-import com.zaxxer.hikari.util.ClockSource.NanosecondClockSource
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 
 @RestController
 @CrossOrigin
@@ -37,7 +33,7 @@ class LessonController (
                 id = lesson.id,
                 subject =lesson.userSubject.subject.name,
                 plainDateTime = lesson.plainDateTime,
-                status = lesson.status.name!!,
+                status = lesson.status.name,
             )
             returnLessons.add(returnLesson)
         }
@@ -68,7 +64,7 @@ class LessonController (
             id =nextLesson.id,
             subject =nextLesson.userSubject.subject.name,
             plainDateTime = nextLesson.plainDateTime,
-            status = nextLesson.status.name!!,
+            status = nextLesson.status.name,
         )
         return ResponseEntity.ok(lessonData)
     }
@@ -114,7 +110,6 @@ class LessonController (
         @RequestHeader("Authorization") token: String
     ): Any {
         val jwtToken = token.replace("Bearer ", "")
-        val userEmail = jwtUtil.getUsernameFromToken(jwtToken)
         val userRole = jwtUtil.getRoleUser(jwtToken)
 
         if(userRole != "TEACHER")
@@ -129,7 +124,7 @@ class LessonController (
                 id = lesson.id,
                 subject = lesson.userSubject.subject.name,
                 plainDateTime = lesson.plainDateTime,
-                status = lesson.status.name!!,
+                status = lesson.status.name,
             )
             val teacherLesson = TeacherLessonData(
                 lessonData=lessonData,
@@ -155,9 +150,7 @@ class LessonController (
         if(userRole != "TEACHER")
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
 
-        val lesson = lessonService.getLessonById(lessonId)
-        if(lesson == null)
-            return ResponseEntity.notFound()
+        val lesson = lessonService.getLessonById(lessonId) ?: return ResponseEntity.notFound()
 
         lesson.status = statusService.getStatusByName("Подтвержден")
         val savedLesson = lessonService.addLesson(lesson)
@@ -166,7 +159,7 @@ class LessonController (
             id = savedLesson.id,
             subject = savedLesson.userSubject.subject.name,
             plainDateTime = savedLesson.plainDateTime,
-            status = savedLesson.status.name!!,
+            status = savedLesson.status.name,
         )
         val teacherLesson = TeacherLessonData(
             lessonData=lessonData,
@@ -184,7 +177,6 @@ class LessonController (
         @RequestParam("month", required = true) month:Int,
     ): Any {
         val jwtToken = token.replace("Bearer ", "")
-        val userEmail = jwtUtil.getUsernameFromToken(jwtToken)
         val userRole = jwtUtil.getRoleUser(jwtToken)
 
         if(userRole != "TEACHER")
@@ -197,7 +189,7 @@ class LessonController (
                 id = lesson.id,
                 subject =lesson.userSubject.subject.name,
                 plainDateTime = lesson.plainDateTime,
-                status = lesson.status.name!!,
+                status = lesson.status.name,
             )
             returnLessons.add(returnLesson)
         }

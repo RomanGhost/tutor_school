@@ -46,9 +46,8 @@ class SubjectController(
         val subjects = subjectService.getAllSubjects()
 
         val returnSubjects = mutableListOf<SubjectData>()
-        var unique=true
         for (subject in subjects) {
-            unique = true
+            var unique = true
             for (userSubject in userSubjects) {
                 if (userSubject.subject.id == subject.id) {
                     unique = false
@@ -61,12 +60,13 @@ class SubjectController(
                     SubjectData(
                         subject.id,
                         subject.name,
-                        subject.price?:0f,
+                        subject.price,
                         level = ""
                     )
                 )
             }
         }
+        println("ReturnSubject: $returnSubjects")
         return ResponseEntity.ok(returnSubjects)
     }
 }

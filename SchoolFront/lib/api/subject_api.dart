@@ -23,7 +23,6 @@ class SubjectApi extends Api {
     try {
       // Используем метод GET из ApiClient
       final result = await _apiClient.getRequest('subject/get_access_user', headers: {
-        'Content-Type': 'application/json',
         'Authorization': 'Bearer $jwt',
       });
 
@@ -84,7 +83,6 @@ class SubjectApi extends Api {
       // Используем метод GET из ApiClient
       final result =
       await _apiClient.getRequest('user_subject/getuserall', headers: {
-        'Content-Type': 'application/json',
         'Authorization': 'Bearer $jwt',
       });
 
