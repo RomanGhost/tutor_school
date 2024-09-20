@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/student/teacher")
+@RequestMapping("/api/student")
 class StudentsController(
     private val userService: UserService,
     private val userSubjectService: UserSubjectService,
     private val jwtUtil: JWTUtil,) {
-    @GetMapping("/get_all")
+    @GetMapping("/teacher/get_all")
     fun getAllStudents(@RequestHeader("Authorization") token: String): ResponseEntity<List<StudentData>> {
         val jwtToken = token.replace("Bearer ", "")
         val userEmail = jwtUtil.getUsernameFromToken(jwtToken)
@@ -40,4 +40,5 @@ class StudentsController(
         }
         return ResponseEntity.ok(listStudent)
     }
+    //TODO Добавить пользователей для админа
 }

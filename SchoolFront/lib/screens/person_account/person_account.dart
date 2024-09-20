@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../dataclasses/user.dart';
 import '../../service/jwt_work.dart';
+import '../../widgets/footer.dart';
 import 'widgets/next_lesson_widget.dart';
 
 
@@ -54,6 +55,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
   }
 
+  Widget _buildBody(){
+    return _userData == null
+        ? const Center(child: CircularProgressIndicator())
+        : Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          NextLessonWidget(),
+          const SizedBox(height: 20),
+          const Expanded(
+            child: Center(
+              child: Text(
+                'Блок еще в разработке...',
+                style: TextStyle(fontSize: 22),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,25 +85,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         title: const Text('Главная'),
       ),
       drawer: const SideMenu(), // Добавление боковой панели
-      body: _userData == null
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            NextLessonWidget(),
-            const SizedBox(height: 20),
-            const Expanded(
-              child: Center(
-                child: Text(
-                  'Блок еще в разработке...',
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-            ),
-          ],
-        ),
+      body: Column(
+        children: [
+          _buildBody(),
+          CustomFooter()
+        ],
       ),
     );
   }

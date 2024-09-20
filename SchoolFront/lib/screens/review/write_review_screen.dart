@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/review_api.dart';
 import '../../dataclasses/review.dart';
+import '../../widgets/footer.dart';
 
 class WriteReviewScreen extends StatefulWidget {
   const WriteReviewScreen({Key? key}) : super(key: key);
@@ -46,11 +47,16 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       appBar: AppBar(
         title: const Text('Написать отзыв'),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: _buildReviewForm(),
-        ),
+      body: Column(
+        children: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: _buildReviewForm(),
+            ),
+          ),
+          CustomFooter()
+        ],
       ),
     );
   }

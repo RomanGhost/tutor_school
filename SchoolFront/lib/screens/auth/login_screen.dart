@@ -6,6 +6,7 @@ import '../../api/auth_api.dart';
 import '../../dataclasses/user.dart';
 import '../../errors/user_errors.dart';
 import '../../service/jwt_work.dart';
+import '../../widgets/footer.dart';
 import '../../widgets/user_forms.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -87,6 +88,38 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Widget _buildBody(){
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Card(
+            elevation: 8,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    userForms.buildEmailNameField(
+                        onFieldSubmitted: (_) => FocusScope.of(context).nextFocus()),
+                    const SizedBox(height: 16),
+                    userForms.buildPasswordField(onFieldSubmitted: (_) => _tryLogin()),
+                    const SizedBox(height: 24),
+                    _buildLoginButton(),
+                    const SizedBox(height: 8),
+                    _buildRegisterButton(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -97,34 +130,11 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('Авторизация')),
-        body: Center(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.0),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 400),
-              child: Card(
-                elevation: 8,
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: <Widget>[
-                        userForms.buildEmailNameField(
-                            onFieldSubmitted: (_) => FocusScope.of(context).nextFocus()),
-                        SizedBox(height: 16),
-                        userForms.buildPasswordField(onFieldSubmitted: (_) => _tryLogin()),
-                        SizedBox(height: 24),
-                        _buildLoginButton(),
-                        SizedBox(height: 8),
-                        _buildRegisterButton(),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        body: Column(
+          children: [
+            _buildBody(),
+            CustomFooter()
+          ],
         ),
       ),
     );

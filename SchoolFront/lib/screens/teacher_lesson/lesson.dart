@@ -3,6 +3,7 @@ import 'package:school/api/lesson_api.dart';
 import 'package:school/dataclasses/lesson.dart';
 import 'package:school/dataclasses/teacher_lesson.dart';
 
+import '../../widgets/footer.dart';
 import '../../widgets/side_menu.dart';
 
 class TeacherLessonsScreen extends StatefulWidget {
@@ -95,6 +96,57 @@ class _TeacherLessonsScreenState extends State<TeacherLessonsScreen> {
     }
   }
 
+  Widget _buildBody(){
+    return _proposedLessons.isEmpty
+        ? Center(child: Text('No proposed lessons'))
+        : ListView.builder(
+      itemCount: _proposedLessons.length,
+      itemBuilder: (context, index) {
+        final teacherLesson = _proposedLessons[index];
+        return Card(
+          elevation: 4,
+          child: ListTile(
+            title: Row(
+              children: [
+                Text(
+                  '${teacherLesson.lesson.status}: ',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _getStatusColor(teacherLesson.lesson.status),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    teacherLesson.lesson.title,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ),
+              ],
+            ),
+            subtitle: Text(
+              'Date: ${teacherLesson.lesson.time}\n'
+                  'Student: ${teacherLesson.firstName} ${teacherLesson.lastName}',
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.check, color: Colors.green),
+                  onPressed: () => _approveLesson(teacherLesson.lesson),
+                ),
+                IconButton(
+                  icon: Icon(Icons.cancel, color: Colors.red),
+                  onPressed: () => _rejectLesson(teacherLesson.lesson),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,53 +154,11 @@ class _TeacherLessonsScreenState extends State<TeacherLessonsScreen> {
         title: Text('Proposed Lessons'),
       ),
       drawer: const SideMenu(),
-      body: _proposedLessons.isEmpty
-          ? Center(child: Text('No proposed lessons'))
-          : ListView.builder(
-        itemCount: _proposedLessons.length,
-        itemBuilder: (context, index) {
-          final teacherLesson = _proposedLessons[index];
-          return Card(
-            elevation: 4,
-            child: ListTile(
-              title: Row(
-                children: [
-                  Text(
-                    '${teacherLesson.lesson.status}: ',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: _getStatusColor(teacherLesson.lesson.status),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      teacherLesson.lesson.title,
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-              subtitle: Text(
-                'Date: ${teacherLesson.lesson.time}\n'
-                    'Student: ${teacherLesson.firstName} ${teacherLesson.lastName}',
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.check, color: Colors.green),
-                    onPressed: () => _approveLesson(teacherLesson.lesson),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.cancel, color: Colors.red),
-                    onPressed: () => _rejectLesson(teacherLesson.lesson),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+      body: Column(
+        children: [
+          _buildBody(),
+          CustomFooter()
+        ],
       ),
     );
   }
