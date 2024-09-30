@@ -51,7 +51,8 @@ class ApiClient {
     final url = _buildUri(endpoint, queryParams);
     final response = await http.delete(
         url, headers: headers, body: json.encode(body));
-    return _processResponse(response);
+
+    return response;
   }
 
   /// Обработка ответа
