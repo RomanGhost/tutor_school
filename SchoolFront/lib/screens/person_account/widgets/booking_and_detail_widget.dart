@@ -233,11 +233,18 @@ class _BookingAndDetailWidgetState extends State<BookingAndDetailWidget> {
       _selectedTime!.minute,
     );
 
-    final newLesson = Lesson(
-      title: _selectedSubject!,
-      time: lessonDateTime,
-      status: "Создан",
-    );
+    final newLesson;
+    if (lessonDateTime.isAfter(DateTime.now())) {
+      newLesson = Lesson(
+        title: _selectedSubject!,
+        time: lessonDateTime,
+        status: "Создан",
+      );
+    }
+    else{
+      _showError("Создать урок в прошлом нельзя");
+      return;
+    }
 
     try {
       final addedLesson = await _lessonApi.addLessons(newLesson);
