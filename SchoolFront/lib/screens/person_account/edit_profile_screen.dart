@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../dataclasses/user.dart';
 import '../../errors/jwt_errors.dart';
+import '../../widgets/footer.dart';
 import '../../widgets/side_menu.dart';
 import '../../widgets/user_forms.dart';
 
@@ -64,6 +65,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  Widget _buildBody(){
+    return FutureBuilder<User?>(
+      future: _loadUserData(),
+      builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData && snapshot.data != null) {
+          userForms = UserForms(snapshot.data!);
+          return Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 400),
+                child: Card(
+                  elevation: 8,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          userForms.buildFirstNameField(),
+                          const SizedBox(height: 20),
+                          userForms.buildLastNameField(),
+                          const SizedBox(height: 20),
+                          userForms.buildSurnameField(),
+                          const SizedBox(height: 20),
+                          userForms.buildPasswordField(),
+                          const SizedBox(height: 20),
+                          userForms.buildConfirmPasswordField(),
+                          const SizedBox(height: 20),
+                          _buildSaveButton(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        } else {
+          return const Center(child: Text('Данные пользователя не найдены'));
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,53 +122,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         title: const Text('Настройки'),
       ),
       drawer: SideMenu(), // Добавление боковой панели
-      body: FutureBuilder<User?>(
-        future: _loadUserData(),
-        builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData && snapshot.data != null) {
-            userForms = UserForms(snapshot.data!);
-            return Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 400),
-                  child: Card(
-                    elevation: 8,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            userForms.buildFirstNameField(),
-                            const SizedBox(height: 20),
-                            userForms.buildLastNameField(),
-                            const SizedBox(height: 20),
-                            userForms.buildSurnameField(),
-                            const SizedBox(height: 20),
-                            userForms.buildPasswordField(),
-                            const SizedBox(height: 20),
-                            userForms.buildConfirmPasswordField(),
-                            const SizedBox(height: 20),
-                            _buildSaveButton(),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          } else {
-            return const Center(child: Text('Данные пользователя не найдены'));
-          }
-        },
+      body: Column(
+        children: [
+          _buildBody(),
+          CustomFooter()
+        ],
       ),
+
     );
   }
 

@@ -1,13 +1,15 @@
-# Используем официальный образ OpenJDK для сборки
-FROM gradle:7.6-jdk17 AS build
+# Используем официальный образ Gradle для сборки
+FROM gradle:8.8-jdk17 AS build
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем файлы проекта
-COPY . .
+# Сначала копируем только файлы конфигурации Gradle и устанавливаем зависимости
+COPY build.gradle.kts settings.gradle.kts ./
+RUN gradle dependencies --no-daemon
 
-# Собираем приложение с помощью Gradle
+# Затем копируем оставшуюся часть проекта и запускаем сборку
+COPY . .
 RUN gradle build --no-daemon -x test
 
 # Используем официальный образ OpenJDK для запуска
@@ -16,12 +18,11 @@ FROM openjdk:17-jdk-slim
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем скомпилированный jar файл из предыдущего шага
+# Копируем скомпилированный JAR файл из предыдущего шага
 COPY --from=build /app/build/libs/*.jar app.jar
 
 # Открываем порт 8080 для приложения
 EXPOSE 8080
 
-# Запускаем приложени
+# Запускаем приложение
 CMD ["java", "-jar", "app.jar"]
-

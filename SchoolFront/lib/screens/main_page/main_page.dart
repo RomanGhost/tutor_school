@@ -3,6 +3,7 @@ import 'package:school/dataclasses/review.dart';
 import 'package:school/screens/main_page/widgets/home_screen_appbar.dart';
 
 import '../../api/review_api.dart';
+import '../../widgets/footer.dart';
 import 'home_screen_body.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,9 +36,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(context),
-      body: HomeScreenBody(
-        profileImageUrl: _profileImageUrl,
-        reviews: _reviews,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            HomeScreenBody(
+              profileImageUrl: _profileImageUrl,
+              reviews: _reviews,
+            ),
+            CustomFooter()
+          ],
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../api/student_api.dart';
 import '../../dataclasses/student.dart';
+import '../../widgets/footer.dart';
 import '../../widgets/side_menu.dart';
 
 class StudentsScreen extends StatefulWidget {
@@ -28,6 +29,30 @@ class _StudentsScreenState extends State<StudentsScreen> {
     });
   }
 
+  Widget _buildBody(){
+    return ListView.builder(
+      itemCount: students.length,
+      itemBuilder: (context, index) {
+        final student = students[index];
+        return Card(
+          margin: EdgeInsets.all(8.0),
+          child: ListTile(
+            leading: CircleAvatar(
+              child: Text(student.firstName[0]), // Инициал имени
+            ),
+            title: Text('${student.firstName} ${student.lastName}'),
+            subtitle: Text(student.subject),
+            trailing: Icon(Icons.arrow_forward),
+            onTap: () {
+              // Обработка нажатия на ученика
+              _showStudentDetails(student);
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,26 +60,11 @@ class _StudentsScreenState extends State<StudentsScreen> {
         title: const Text('Ученики'),
       ),
       drawer: SideMenu(),
-      body: ListView.builder(
-        itemCount: students.length,
-        itemBuilder: (context, index) {
-          final student = students[index];
-          return Card(
-            margin: EdgeInsets.all(8.0),
-            child: ListTile(
-              leading: CircleAvatar(
-                child: Text(student.firstName[0]), // Инициал имени
-              ),
-              title: Text('${student.firstName} ${student.lastName}'),
-              subtitle: Text(student.subject),
-              trailing: Icon(Icons.arrow_forward),
-              onTap: () {
-                // Обработка нажатия на ученика
-                _showStudentDetails(student);
-              },
-            ),
-          );
-        },
+      body: Column(
+        children: [
+          _buildBody(),
+          CustomFooter()
+        ],
       ),
     );
   }

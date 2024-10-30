@@ -36,8 +36,7 @@ class _SubjectCardState extends State<SubjectCard> {
             ),
           ),
           style: TextStyle(fontSize: 12), // Font size inside dropdown
-          value: widget.subject.level != null &&
-              ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].contains(widget.subject.level)
+          value: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].contains(widget.subject.level)
               ? widget.subject.level
               : 'A1', // Устанавливаем уровень по умолчанию, если текущий уровень невалидный
           items: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']

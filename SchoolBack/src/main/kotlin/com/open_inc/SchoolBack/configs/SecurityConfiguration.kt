@@ -25,8 +25,8 @@ class SecurityConfiguration(
         return http.csrf{it.disable()}
             .authorizeHttpRequests {
                 it.requestMatchers("/api/auth/**", "/api/review/get_all").permitAll()
-                //TODO Сделать нормкльную авторизацию по Роли, а не как сейчас внутри функции
-//                it.requestMatchers("/api/lesson/teacher/**", "/api/student/teacher/**")
+                //TODO Сделать нормальную авторизацию по Роли, а не как сейчас внутри функции
+//                it.requestMatchers("/api/lesson/teacher/**", "/api/student/teacher/**").hasRole("TEACHER")
                 it.anyRequest().authenticated()
             }
             .sessionManagement {
